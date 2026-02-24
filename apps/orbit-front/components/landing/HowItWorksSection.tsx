@@ -1,47 +1,46 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const steps = [
-    {
-        number: "01",
-        icon: "🌐",
-        title: "Данные",
-        subtitle: "Data Hub",
-        description:
-            "Платформа автоматически собирает спутниковые снимки, TLE-орбиты и метеоданные из открытых каталогов (Sentinel, Landsat, Celestrak) и пишет их в PostGIS.",
-        color: "#00F0FF",
-    },
-    {
-        number: "02",
-        icon: "🤖",
-        title: "ИИ-анализ",
-        subtitle: "ML Models",
-        description:
-            "Обученные модели (LightGBM, CatBoost) и физические алгоритмы анализируют данные: оценивают ценность снимка, предсказывают задержки запуска, оптимизируют маневры.",
-        color: "#9D4EDD",
-    },
-    {
-        number: "03",
-        icon: "📊",
-        title: "Инсайты",
-        subtitle: "Reports & Scores",
-        description:
-            "Система формирует понятные бизнес-метрики: оценки от 0 до 100, прогнозы ROI с доверительным интервалом, PDF-отчеты с объяснением каждого решения ИИ (XAI).",
-        color: "#10B981",
-    },
-    {
-        number: "04",
-        icon: "💰",
-        title: "Прибыль",
-        subtitle: "Business Value",
-        description:
-            "Инвестор принимает взвешенное решение: закупать снимок или нет, на какую орбиту запускать, как избежать переноса старта — с цифрами и фактами, а не интуицией.",
-        color: "#00F0FF",
-    },
-];
+import { useTranslations } from "next-intl";
 
 export default function HowItWorksSection() {
+    const t = useTranslations("HowItWorks");
+
+    const steps = [
+        {
+            number: "01",
+            icon: "🌐",
+            title: t("steps.data.title"),
+            subtitle: t("steps.data.subtitle"),
+            description: t("steps.data.description"),
+            color: "#00F0FF",
+        },
+        {
+            number: "02",
+            icon: "🤖",
+            title: t("steps.ai.title"),
+            subtitle: t("steps.ai.subtitle"),
+            description: t("steps.ai.description"),
+            color: "#9D4EDD",
+        },
+        {
+            number: "03",
+            icon: "📊",
+            title: t("steps.insights.title"),
+            subtitle: t("steps.insights.subtitle"),
+            description: t("steps.insights.description"),
+            color: "#10B981",
+        },
+        {
+            number: "04",
+            icon: "💰",
+            title: t("steps.profit.title"),
+            subtitle: t("steps.profit.subtitle"),
+            description: t("steps.profit.description"),
+            color: "#00F0FF",
+        },
+    ];
+
     return (
         <section id="how-it-works" className="relative py-32 px-6 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_30%_at_50%_100%,rgba(157,78,221,0.06),transparent)]" />
@@ -56,13 +55,13 @@ export default function HowItWorksSection() {
                     className="text-center mb-24"
                 >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#10B981]/30 bg-[#10B981]/5 text-xs text-[#10B981] mb-6">
-                        Процесс
+                        {t("badge")}
                     </div>
                     <h2 className="text-4xl md:text-5xl font-semibold text-white tracking-tighter mb-5">
-                        Как это работает
+                        {t("title")}
                     </h2>
                     <p className="text-white/45 text-lg max-w-xl mx-auto">
-                        От сырых спутниковых данных до инвестиционного решения за секунды.
+                        {t("subtitle")}
                     </p>
                 </motion.div>
 

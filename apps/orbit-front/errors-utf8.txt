@@ -1,0 +1,173 @@
+﻿components/ui/resizable.tsx(11,51): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("D:/orbit/apps/orbit-front/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(12,23): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("D:/orbit/apps/orbit-front/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(27,51): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("D:/orbit/apps/orbit-front/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(30,23): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("D:/orbit/apps/orbit-front/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(42,24): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("D:/orbit/apps/orbit-front/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+
+> orbit-front@0.1.0 lint
+> eslint
+
+
+D:\orbit\apps\orbit-front\app\[locale]\layout.tsx
+  35:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx
+   3:10  warning  'useEffect' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   3:21  warning  'useRef' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  17:33  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:17:33
+  15 |                     className="absolute h-px rounded-full bg-gradient-to-r from-[#00F0FF] to-transparent pointer-events-none"
+  16 |                     style={{
+> 17 |                         top: `${Math.random() * 90}%`,
+     |                                 ^^^^^^^^^^^^^ Cannot call impure function
+  18 |                         left: `${Math.random() * 90}%`,
+  19 |                         width: `${80 + Math.random() * 150}px`,
+  20 |                         transform: "rotate(215deg)",             react-hooks/purity
+  18:34  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:18:34
+  16 |                     style={{
+  17 |                         top: `${Math.random() * 90}%`,
+> 18 |                         left: `${Math.random() * 90}%`,
+     |                                  ^^^^^^^^^^^^^ Cannot call impure function
+  19 |                         width: `${80 + Math.random() * 150}px`,
+  20 |                         transform: "rotate(215deg)",
+  21 |                         animationName: "meteor",                                                                                         react-hooks/purity
+  19:40  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:19:40
+  17 |                         top: `${Math.random() * 90}%`,
+  18 |                         left: `${Math.random() * 90}%`,
+> 19 |                         width: `${80 + Math.random() * 150}px`,
+     |                                        ^^^^^^^^^^^^^ Cannot call impure function
+  20 |                         transform: "rotate(215deg)",
+  21 |                         animationName: "meteor",
+  22 |                         animationDuration: `${3 + Math.random() * 4}s`,                                        react-hooks/purity
+  22:51  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:22:51
+  20 |                         transform: "rotate(215deg)",
+  21 |                         animationName: "meteor",
+> 22 |                         animationDuration: `${3 + Math.random() * 4}s`,
+     |                                                   ^^^^^^^^^^^^^ Cannot call impure function
+  23 |                         animationDelay: `${Math.random() * 6}s`,
+  24 |                         animationTimingFunction: "linear",
+  25 |                         animationIterationCount: "infinite",                   react-hooks/purity
+  23:44  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:23:44
+  21 |                         animationName: "meteor",
+  22 |                         animationDuration: `${3 + Math.random() * 4}s`,
+> 23 |                         animationDelay: `${Math.random() * 6}s`,
+     |                                            ^^^^^^^^^^^^^ Cannot call impure function
+  24 |                         animationTimingFunction: "linear",
+  25 |                         animationIterationCount: "infinite",
+  26 |                         boxShadow: "0:0 4px 0 rgba(0,240,255,0.4)",           react-hooks/purity
+  61:39  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:61:39
+  59 |                     className="absolute rounded-full pointer-events-none"
+  60 |                     style={{
+> 61 |                         width: `${1 + Math.random() * 2}px`,
+     |                                       ^^^^^^^^^^^^^ Cannot call impure function
+  62 |                         height: `${1 + Math.random() * 2}px`,
+  63 |                         top: `${Math.random() * 100}%`,
+  64 |                         left: `${Math.random() * 100}%`,                                                   react-hooks/purity
+  62:40  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:62:40
+  60 |                     style={{
+  61 |                         width: `${1 + Math.random() * 2}px`,
+> 62 |                         height: `${1 + Math.random() * 2}px`,
+     |                                        ^^^^^^^^^^^^^ Cannot call impure function
+  63 |                         top: `${Math.random() * 100}%`,
+  64 |                         left: `${Math.random() * 100}%`,
+  65 |                         background: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",                                                   react-hooks/purity
+  63:33  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:63:33
+  61 |                         width: `${1 + Math.random() * 2}px`,
+  62 |                         height: `${1 + Math.random() * 2}px`,
+> 63 |                         top: `${Math.random() * 100}%`,
+     |                                 ^^^^^^^^^^^^^ Cannot call impure function
+  64 |                         left: `${Math.random() * 100}%`,
+  65 |                         background: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",
+  66 |                         opacity: 0.15 + Math.random() * 0.2,                          react-hooks/purity
+  64:34  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:64:34
+  62 |                         height: `${1 + Math.random() * 2}px`,
+  63 |                         top: `${Math.random() * 100}%`,
+> 64 |                         left: `${Math.random() * 100}%`,
+     |                                  ^^^^^^^^^^^^^ Cannot call impure function
+  65 |                         background: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",
+  66 |                         opacity: 0.15 + Math.random() * 0.2,
+  67 |                         animationName: "pulse-glow",                                 react-hooks/purity
+  66:41  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:66:41
+  64 |                         left: `${Math.random() * 100}%`,
+  65 |                         background: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",
+> 66 |                         opacity: 0.15 + Math.random() * 0.2,
+     |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  67 |                         animationName: "pulse-glow",
+  68 |                         animationDuration: `${2 + Math.random() * 4}s`,
+  69 |                         animationDelay: `${Math.random() * 4}s`,       react-hooks/purity
+  68:51  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:68:51
+  66 |                         opacity: 0.15 + Math.random() * 0.2,
+  67 |                         animationName: "pulse-glow",
+> 68 |                         animationDuration: `${2 + Math.random() * 4}s`,
+     |                                                   ^^^^^^^^^^^^^ Cannot call impure function
+  69 |                         animationDelay: `${Math.random() * 4}s`,
+  70 |                         animationTimingFunction: "ease-in-out",
+  71 |                         animationIterationCount: "infinite",  react-hooks/purity
+  69:44  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\orbit\apps\orbit-front\components\landing\HeroSection.tsx:69:44
+  67 |                         animationName: "pulse-glow",
+  68 |                         animationDuration: `${2 + Math.random() * 4}s`,
+> 69 |                         animationDelay: `${Math.random() * 4}s`,
+     |                                            ^^^^^^^^^^^^^ Cannot call impure function
+  70 |                         animationTimingFunction: "ease-in-out",
+  71 |                         animationIterationCount: "infinite",
+  72 |                     }}                                               react-hooks/purity
+
+D:\orbit\apps\orbit-front\hooks\use-toast.ts
+  21:7  warning  'actionTypes' is assigned a value but only used as a type  @typescript-eslint/no-unused-vars
+
+D:\orbit\apps\orbit-front\i18n\request.ts
+   2:10  warning  'notFound' is defined but never used      @typescript-eslint/no-unused-vars
+  10:56  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\orbit\apps\orbit-front\tailwind.config.ts
+  113:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+тЬЦ 19 problems (15 errors, 4 warnings)
+

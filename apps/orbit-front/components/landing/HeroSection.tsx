@@ -1,25 +1,40 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "../../i18n/routing";
+import { useTranslations } from "next-intl";
 
 // ── Magic UI: Meteors ─────────────────────────────────────────────
 function Meteors({ number = 14 }: { number?: number }) {
+    const [meteors, setMeteors] = useState<Array<{ top: string; left: string; width: string; duration: string; delay: string }>>([]);
+
+    useEffect(() => {
+        setMeteors(
+            Array.from({ length: number }).map(() => ({
+                top: `${Math.random() * 90}%`,
+                left: `${Math.random() * 90}%`,
+                width: `${80 + Math.random() * 150}px`,
+                duration: `${3 + Math.random() * 4}s`,
+                delay: `${Math.random() * 6}s`,
+            }))
+        );
+    }, [number]);
+
     return (
         <>
-            {Array.from({ length: number }).map((_, i) => (
+            {meteors.map((m, i) => (
                 <span
                     key={i}
                     className="absolute h-px rounded-full bg-gradient-to-r from-[#00F0FF] to-transparent pointer-events-none"
                     style={{
-                        top: `${Math.random() * 90}%`,
-                        left: `${Math.random() * 90}%`,
-                        width: `${80 + Math.random() * 150}px`,
+                        top: m.top,
+                        left: m.left,
+                        width: m.width,
                         transform: "rotate(215deg)",
                         animationName: "meteor",
-                        animationDuration: `${3 + Math.random() * 4}s`,
-                        animationDelay: `${Math.random() * 6}s`,
+                        animationDuration: m.duration,
+                        animationDelay: m.delay,
                         animationTimingFunction: "linear",
                         animationIterationCount: "infinite",
                         boxShadow: "0 0 4px 0 rgba(0,240,255,0.4)",
@@ -49,23 +64,39 @@ function GridPattern() {
 
 // ── Magic UI: Particles (floating dots) ──────────────────────────
 function Particles({ count = 30 }: { count?: number }) {
-    const particles = Array.from({ length: count });
+    const [particles, setParticles] = useState<Array<{ width: string; height: string; top: string; left: string; bg: string; opacity: number; duration: string; delay: string }>>([]);
+
+    useEffect(() => {
+        setParticles(
+            Array.from({ length: count }).map((_, i) => ({
+                width: `${1 + Math.random() * 2}px`,
+                height: `${1 + Math.random() * 2}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                bg: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",
+                opacity: 0.15 + Math.random() * 0.2,
+                duration: `${2 + Math.random() * 4}s`,
+                delay: `${Math.random() * 4}s`,
+            }))
+        );
+    }, [count]);
+
     return (
         <>
-            {particles.map((_, i) => (
+            {particles.map((p, i) => (
                 <span
                     key={i}
                     className="absolute rounded-full pointer-events-none"
                     style={{
-                        width: `${1 + Math.random() * 2}px`,
-                        height: `${1 + Math.random() * 2}px`,
-                        top: `${Math.random() * 100}%`,
-                        left: `${Math.random() * 100}%`,
-                        background: i % 3 === 0 ? "#9D4EDD" : "#00F0FF",
-                        opacity: 0.15 + Math.random() * 0.2,
+                        width: p.width,
+                        height: p.height,
+                        top: p.top,
+                        left: p.left,
+                        background: p.bg,
+                        opacity: p.opacity,
                         animationName: "pulse-glow",
-                        animationDuration: `${2 + Math.random() * 4}s`,
-                        animationDelay: `${Math.random() * 4}s`,
+                        animationDuration: p.duration,
+                        animationDelay: p.delay,
                         animationTimingFunction: "ease-in-out",
                         animationIterationCount: "infinite",
                     }}
@@ -95,6 +126,8 @@ const fadeUp = {
 };
 
 export default function HeroSection() {
+    const t = useTranslations("Hero");
+
     return (
         <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 pt-24 pb-16">
             {/* Layered backgrounds */}
@@ -125,7 +158,7 @@ export default function HeroSection() {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#00F0FF]/25 bg-[#00F0FF]/5 text-xs text-[#00F0FF] mb-8"
                 >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse" />
-                    <span className="hidden sm:inline">10 ИИ-модулей · Спутниковые данные · </span>Орбитальная аналитика
+                    <span>{t("badge")}</span>
                 </motion.div>
 
                 {/* H1 */}
@@ -136,14 +169,14 @@ export default function HeroSection() {
                     variants={fadeUp}
                     className="text-4xl sm:text-6xl md:text-7xl font-semibold text-white leading-[1.08] tracking-tighter mb-6"
                 >
-                    Превратите{" "}
+                    {t("titleLine1")}
                     <span
                         className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-[#9D4EDD] to-[#00F0FF] bg-[length:200%_100%] animate-gradient-x"
                     >
-                        космос
+                        {t("titleGradient")}
                     </span>
                     <br />
-                    <span className="sm:inline">в прибыль</span>
+                    <span className="sm:inline">{t("titleLine2")}</span>
                 </motion.h1>
 
                 {/* Sub */}
@@ -154,9 +187,7 @@ export default function HeroSection() {
                     variants={fadeUp}
                     className="text-base sm:text-lg text-white/50 leading-relaxed max-w-2xl mx-auto mb-10 px-2"
                 >
-                    OrbitAI — AI-платформа для монетизации спутниковых данных.
-                    Оцениваем снимки, оптимизируем орбиты и генерируем инженерные ТЗ
-                    до запуска миссии.
+                    {t("description")}
                 </motion.p>
 
                 {/* CTA */}
@@ -171,7 +202,7 @@ export default function HeroSection() {
                         href="/auth/register"
                         className="w-full sm:w-auto px-8 py-3.5 rounded-md bg-[#00F0FF] text-[#0A0E17] font-semibold text-sm hover:brightness-110 hover:shadow-[0_0_35px_rgba(0,240,255,0.45)] transition-all duration-300"
                     >
-                        Запустить демо
+                        {t("ctaDemo")}
                     </Link>
                     <a
                         href="#features"
@@ -181,7 +212,7 @@ export default function HeroSection() {
                         }}
                         className="w-full sm:w-auto px-8 py-3.5 rounded-md border border-white/15 text-white/60 text-sm hover:border-white/35 hover:text-white transition-all duration-300 cursor-pointer"
                     >
-                        Смотреть модули →
+                        {t("ctaExplore")}
                     </a>
                 </motion.div>
 
@@ -194,9 +225,9 @@ export default function HeroSection() {
                     className="mt-20 flex items-center justify-center gap-6 sm:gap-14"
                 >
                     {[
-                        { value: "10", label: "ИИ-модулей" },
-                        { value: "3", label: "сервиса" },
-                        { value: "∞", label: "возможностей" },
+                        { value: t("stat1Value"), label: t("stat1Label") },
+                        { value: t("stat2Value"), label: t("stat2Label") },
+                        { value: t("stat3Value"), label: t("stat3Label") },
                     ].map((s) => (
                         <div key={s.label} className="text-center">
                             <div className="text-2xl sm:text-3xl font-semibold text-white tabular-nums">{s.value}</div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 // Magic UI Marquee — infinite logo ticker
 const logos = [
     { name: "SpaceX", icon: "🚀" },
@@ -22,6 +24,8 @@ function LogoItem({ name, icon }: { name: string; icon: string }) {
 }
 
 export default function LogoTicker() {
+    const t = useTranslations("LogoTicker");
+
     // Double the array to create seamless loop
     const doubled = [...logos, ...logos];
 
@@ -32,7 +36,7 @@ export default function LogoTicker() {
             <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-[#0A0E17] to-transparent pointer-events-none" />
 
             <p className="text-center text-xs text-white/30 uppercase tracking-widest mb-8">
-                Доверяют лидеры отрасли
+                {t("trustedBy")}
             </p>
 
             {/* Marquee track */}

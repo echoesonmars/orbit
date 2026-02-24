@@ -1,15 +1,38 @@
 "use client";
 
-import Link from "next/link";
-
-const footerLinks = {
-    Платформа: ["Data Hub", "Mission Designer", "Value Predictor", "Report Generator", "Orbit Optimizer"],
-    Компания: ["О нас", "Блог", "Карьера", "Пресса"],
-    Документация: ["API Reference", "Быстрый старт", "Примеры", "Changelog"],
-    Правовые: ["Политика конфиденциальности", "Условия использования", "Cookies"],
-};
+import { Link } from "../../i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function FooterSection() {
+    const t = useTranslations("Footer");
+
+    const footerLinks = {
+        [t("platform")]: [
+            { label: "Data Hub", href: "#" },
+            { label: "Mission Designer", href: "#" },
+            { label: "Value Predictor", href: "#" },
+            { label: "Report Generator", href: "#" },
+            { label: "Orbit Optimizer", href: "#" },
+        ],
+        [t("company")]: [
+            { label: t("links.about"), href: "#" },
+            { label: t("links.blog"), href: "#" },
+            { label: t("links.careers"), href: "#" },
+            { label: t("links.press"), href: "#" },
+        ],
+        [t("docs")]: [
+            { label: t("links.api"), href: "#" },
+            { label: t("links.quickstart"), href: "#" },
+            { label: t("links.examples"), href: "#" },
+            { label: t("links.changelog"), href: "#" },
+        ],
+        [t("legal")]: [
+            { label: t("links.privacy"), href: "#" },
+            { label: t("links.terms"), href: "#" },
+            { label: t("links.cookies"), href: "#" },
+        ],
+    };
+
     return (
         <footer className="relative border-t border-white/5 py-20 px-6">
             <div className="max-w-7xl mx-auto">
@@ -25,7 +48,7 @@ export default function FooterSection() {
                             </span>
                         </Link>
                         <p className="text-xs text-white/35 leading-relaxed max-w-[180px]">
-                            Превращаем спутниковые данные в бизнес-решения с помощью ИИ.
+                            {t("tagline")}
                         </p>
                     </div>
 
@@ -37,12 +60,12 @@ export default function FooterSection() {
                             </h4>
                             <ul className="space-y-3">
                                 {links.map((link) => (
-                                    <li key={link}>
+                                    <li key={link.label}>
                                         <a
-                                            href="#"
+                                            href={link.href}
                                             className="text-xs text-white/35 hover:text-white/70 transition-colors duration-200"
                                         >
-                                            {link}
+                                            {link.label}
                                         </a>
                                     </li>
                                 ))}
@@ -54,12 +77,12 @@ export default function FooterSection() {
                 {/* Bottom bar */}
                 <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-white/25">
-                        © 2026 OrbitAI. Все права защищены.
+                        {t("rights")}
                     </p>
                     <div className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
                         <span className="text-xs text-white/25">
-                            Все системы работают нормально
+                            {t("status")}
                         </span>
                     </div>
                 </div>

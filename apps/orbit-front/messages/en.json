@@ -1,0 +1,173 @@
+{
+    "Navbar": {
+        "product": "Product",
+        "howItWorks": "How it works",
+        "about": "Platform",
+        "login": "Log in",
+        "startForFree": "Start for free"
+    },
+    "Hero": {
+        "badge": "10 AI Modules · Satellite Data · Orbital Analytics",
+        "titleLine1": "Turn ",
+        "titleGradient": "space",
+        "titleLine2": " into profit",
+        "description": "OrbitAI is an AI platform for monetizing satellite data. We evaluate images, optimize orbits, and generate engineering specs before mission launch.",
+        "ctaDemo": "Launch Demo",
+        "ctaExplore": "Explore Modules →",
+        "stat1Value": "10",
+        "stat1Label": "AI Modules",
+        "stat2Value": "3",
+        "stat2Label": "Services",
+        "stat3Value": "∞",
+        "stat3Label": "Possibilities"
+    },
+    "LogoTicker": {
+        "trustedBy": "Trusted by industry leaders"
+    },
+    "Features": {
+        "badge": "10 Modules",
+        "title": "What the platform can do",
+        "subtitle": "Select any module to see what it does",
+        "modulePrefix": "Module",
+        "learnMore": "Learn more",
+        "otherModules": "Other modules",
+        "modules": {
+            "dataHub": {
+                "title": "Data Hub",
+                "tagline": "Raw data turning into assets",
+                "description": "Every 24 hours, the platform automatically crawls open catalogs of NASA, ESA, and Celestrak, downloads millions of records about satellites and Earth imagery, and stores them in a unified spatial database. You just draw a box on the map — the system instantly finds all scenes for any period.",
+                "statLabel": "Data update",
+                "statValue": "24h"
+            },
+            "missionDesigner": {
+                "title": "Mission Designer",
+                "tagline": "Business language → engineering specs",
+                "description": "Write in plain text: \"I want to monitor wheat crop yields in Kazakhstan once a week.\" The system translates this into ready-made technical specifications: orbit type, capture angle, sensor mode, and optimal revisit time.",
+                "statLabel": "Spec generation time",
+                "statValue": "< 5 sec"
+            },
+            "captureValuePredictor": {
+                "title": "Capture Value Predictor",
+                "tagline": "Image price — before it's captured",
+                "description": "Provide coordinates and capture date. AI accounts for cloud coverage forecasts, terrain type, seasonal demand, and market prices — and tells you how many dollars this image can be sold for on the data exchange. Before launching the satellite.",
+                "statLabel": "Prediction accuracy",
+                "statValue": "87%"
+            },
+            "reportGenerator": {
+                "title": "Report Generator",
+                "tagline": "PDF report with explainable decisions",
+                "description": "Click one button — in a minute you download a professional PDF with a zone map, risk charts, an AI text summary, and diagrams that explain exactly why the system made this decision (XAI).",
+                "statLabel": "Generation time",
+                "statValue": "~60 sec"
+            },
+            "launchDelayPredictor": {
+                "title": "Launch Delay Predictor",
+                "tagline": "Know about a delay 72 hours early",
+                "description": "The system monitors all scheduled launches, checks spaceport weather, and historic rocket statistics. A red bar warns of the probability of a delay with explained reasons — before any official announcement.",
+                "statLabel": "Forecast horizon",
+                "statValue": "72h"
+            },
+            "orbitOptimizer": {
+                "title": "Orbit Optimizer",
+                "tagline": "Every drop of fuel matters",
+                "description": "Specify current and target orbit. The system calculates the most economical maneuver route (Hohmann transfer), tells you how many kg of fuel will burn, and translates it into dollars. An interactive 3D globe shows the trajectory.",
+                "statLabel": "Fuel savings",
+                "statValue": "up to 40%"
+            },
+            "orbitSuitabilityScorer": {
+                "title": "Orbit Suitability Scorer",
+                "tagline": "Is this orbit good for your business?",
+                "description": "Enter proposed orbit parameters and business objectives. The system scores criteria: area coverage, signal latency, revisit rate. A spider-web chart shows the orbital strengths and weaknesses.",
+                "statLabel": "Analysis metrics",
+                "statValue": "12"
+            },
+            "failureForensics": {
+                "title": "Failure Forensics",
+                "tagline": "Find failure cause from logs",
+                "description": "Upload a telemetry CSV — the system analyzes thousands of rows in seconds and highlights anomalous milliseconds in red. Adjacent is a text summary: exactly what happened and which node failed.",
+                "statLabel": "Analysis speed",
+                "statValue": "< 3 sec"
+            },
+            "scenarioSimulator": {
+                "title": "Scenario Simulator",
+                "tagline": "Run your business 10,000 times",
+                "description": "Enter budget, launch cost, and target region. The simulator runs 10,000 virtual satellite lifespans across varying weather and market conditions in seconds. A probability cone shows median profit and true downside risk.",
+                "statLabel": "Scenarios per run",
+                "statValue": "10,000"
+            },
+            "esgAssessor": {
+                "title": "ESG Assessor",
+                "tagline": "Mission's environmental passport",
+                "description": "Enter rocket and orbit parameters — the system calculates carbon footprint, space debris risk, and assigns an ESG rating from A+ to F. AI suggests concrete engineering changes to improve investor ratings.",
+                "statLabel": "Rating scale",
+                "statValue": "A+ → F"
+            }
+        }
+    },
+    "HowItWorks": {
+        "badge": "Process",
+        "title": "How it works",
+        "subtitle": "From raw satellite data to investment decisions in seconds.",
+        "steps": {
+            "data": {
+                "title": "Data",
+                "subtitle": "Data Hub",
+                "description": "Automatically gathers satellite scenes, TLEs, and weather from open catalogs (Sentinel, Landsat, Celestrak) indexing into PostGIS."
+            },
+            "ai": {
+                "title": "AI Analysis",
+                "subtitle": "ML Models",
+                "description": "Trained ML algorithms (LightGBM, CatBoost) and physical models evaluate image value, predict delays, and optimize transfers."
+            },
+            "insights": {
+                "title": "Insights",
+                "subtitle": "Reports & Scores",
+                "description": "Systems generate clear business metrics: 0 to 100 scores, ROI forecasts with confidence intervals, and explainable AI (XAI) PDF reports."
+            },
+            "profit": {
+                "title": "Profit",
+                "subtitle": "Business Value",
+                "description": "Investors make informed decisions: whether to buy a scene, where to launch, and how to avoid delays — driven by facts, not intuition."
+            }
+        }
+    },
+    "Stats": {
+        "modules": "AI modules on the platform",
+        "services": "independent services",
+        "accuracy": "physics calculation accuracy",
+        "cost": "data cost (open APIs)"
+    },
+    "Cta": {
+        "badge": "Free Start",
+        "titleLine1": "Ready to digitize",
+        "titleGradient": "your space?",
+        "description": "Launch the platform today. Your first Capture Value Predictor runs are free. No credit card required.",
+        "buttonStart": "Start for free",
+        "buttonExplore": "Explore modules"
+    },
+    "Footer": {
+        "tagline": "Turning satellite data into business decisions with AI.",
+        "rights": "© 2026 OrbitAI. All rights reserved.",
+        "status": "All systems operational",
+        "platform": "Platform",
+        "company": "Company",
+        "docs": "Documentation",
+        "legal": "Legal",
+        "links": {
+            "about": "About us",
+            "blog": "Blog",
+            "careers": "Careers",
+            "press": "Press",
+            "api": "API Reference",
+            "quickstart": "Quickstart",
+            "examples": "Examples",
+            "changelog": "Changelog",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "cookies": "Cookies"
+        }
+    },
+    "LanguageSwitcher": {
+        "ariaLabel": "Select language"
+    }
+}

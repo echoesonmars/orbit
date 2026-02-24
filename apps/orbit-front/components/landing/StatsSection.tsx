@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 // Magic UI AnimatedNumber — count up on enter
 function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -31,14 +32,16 @@ function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: stri
     );
 }
 
-const stats = [
-    { value: 10, suffix: "", label: "ИИ-модулей на платформе", color: "#00F0FF" },
-    { value: 3, suffix: "", label: "независимых сервиса", color: "#9D4EDD" },
-    { value: 99, suffix: "%", label: "точность физических расчетов", color: "#10B981" },
-    { value: 0, suffix: "$", label: "затрат на данные (открытые API)", color: "#00F0FF" },
-];
-
 export default function StatsSection() {
+    const t = useTranslations("Stats");
+
+    const stats = [
+        { value: 10, suffix: "", label: t("modules"), color: "#00F0FF" },
+        { value: 3, suffix: "", label: t("services"), color: "#9D4EDD" },
+        { value: 99, suffix: "%", label: t("accuracy"), color: "#10B981" },
+        { value: 0, suffix: "$", label: t("cost"), color: "#00F0FF" },
+    ];
+
     return (
         <section id="stats" className="relative py-24 px-6 overflow-hidden">
             {/* Background */}

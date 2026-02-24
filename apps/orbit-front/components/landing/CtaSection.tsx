@@ -1,9 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "../../i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function CtaSection() {
+    const t = useTranslations("Cta");
+
     return (
         <section className="relative py-40 px-6 overflow-hidden">
             {/* Background decoration */}
@@ -37,20 +40,19 @@ export default function CtaSection() {
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00F0FF]/30 bg-[#00F0FF]/5 text-xs text-[#00F0FF] mb-8">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse" />
-                        Бесплатный старт
+                        {t("badge")}
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-semibold text-white tracking-tighter mb-6 leading-[1.1]">
-                        Готовы оцифровать
+                        {t("titleLine1")}
                         <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] to-[#9D4EDD]">
-                            ваш космос?
+                            {t("titleGradient")}
                         </span>
                     </h2>
 
                     <p className="text-white/45 text-base mb-12 max-w-md mx-auto leading-relaxed">
-                        Запустите платформу сегодня. Первые расчеты Capture Value Predictor —
-                        бесплатно. Никаких кредитных карт.
+                        {t("description")}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -58,14 +60,14 @@ export default function CtaSection() {
                             href="/auth/register"
                             className="px-10 py-4 rounded-md bg-[#00F0FF] text-[#0A0E17] font-semibold text-sm hover:bg-[#00F0FF]/90 hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] transition-all duration-300"
                         >
-                            Начать бесплатно
+                            {t("buttonStart")}
                         </Link>
-                        <Link
+                        <a
                             href="#features"
-                            className="px-10 py-4 rounded-md border border-white/15 text-white/60 text-sm hover:border-white/30 hover:text-white transition-all duration-300"
+                            className="px-10 py-4 rounded-md border border-white/15 text-white/60 text-sm hover:border-white/30 hover:text-white transition-all duration-300 cursor-pointer"
                         >
-                            Изучить модули
-                        </Link>
+                            {t("buttonExplore")}
+                        </a>
                     </div>
                 </motion.div>
             </div>

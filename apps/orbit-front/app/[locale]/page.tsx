@@ -8,16 +8,16 @@ import CtaSection from "@/components/landing/CtaSection";
 import FooterSection from "@/components/landing/FooterSection";
 
 export default function LandingPage() {
-  return (
-    <main className="min-h-screen bg-[#0A0E17] text-white">
-      <Navbar />
-      <HeroSection />
-      <LogoTicker />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <StatsSection />
-      <CtaSection />
-      <FooterSection />
-    </main>
-  );
+    return (
+        <main className="min-h-screen bg-[#0A0E17] text-white">
+            <Navbar />
+            <HeroSection />
+            <LogoTicker />
+            <FeaturesSection />
+            <HowItWorksSection />
+            <StatsSection />
+            <CtaSection />
+            <FooterSection />
+        </main>
+    );
 }

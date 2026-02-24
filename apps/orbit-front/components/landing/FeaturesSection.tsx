@@ -2,122 +2,115 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const modules = [
-    {
-        id: 0,
-        icon: "🌐",
-        title: "Data Hub",
-        tagline: "Сырые данные превращаются в активы",
-        description:
-            "Каждые 24 часа платформа автоматически обходит открытые каталоги NASA, ESA и Celestrak, скачивает миллионы записей о спутниках и снимках Земли и складывает их в единую пространственную базу. Вы просто рисуете квадрат на карте — система мгновенно находит все снимки за любой период.",
-        color: "#00F0FF",
-        bg: "from-[#00F0FF]/10 via-transparent to-transparent",
-        stat: { label: "Обновление данных", value: "24ч" },
-    },
-    {
-        id: 1,
-        icon: "🧠",
-        title: "Mission Designer",
-        tagline: "Бизнес-язык → инженерное ТЗ",
-        description:
-            "Напишите обычным текстом: «Хочу следить за урожайностью полей в Казахстане раз в неделю». Система переведет это в готовое техническое задание: тип орбиты, угол съемки, режим сенсора, оптимальное время пролета.",
-        color: "#9D4EDD",
-        bg: "from-[#9D4EDD]/10 via-transparent to-transparent",
-        stat: { label: "Время генерации ТЗ", value: "< 5 сек" },
-    },
-    {
-        id: 2,
-        icon: "💎",
-        title: "Capture Value Predictor",
-        tagline: "Цена снимка — до его создания",
-        description:
-            "Укажите координаты и дату съемки. ИИ учтет прогноз облачности, тип местности, сезонный спрос и рыночные цены — и скажет, за сколько долларов этот снимок можно продать на бирже данных. До запуска спутника.",
-        color: "#10B981",
-        bg: "from-[#10B981]/10 via-transparent to-transparent",
-        stat: { label: "Точность прогноза", value: "87%" },
-    },
-    {
-        id: 3,
-        icon: "📄",
-        title: "Report Generator",
-        tagline: "PDF-отчет с объяснением каждого решения",
-        description:
-            "Нажмите одну кнопку — через минуту скачивается профессиональный PDF с картой зоны, графиком рисков, текстовым резюме от ИИ и диаграммами, которые объясняют почему система приняла именно такое решение (XAI).",
-        color: "#00F0FF",
-        bg: "from-[#00F0FF]/10 via-transparent to-transparent",
-        stat: { label: "Время генерации", value: "~60 сек" },
-    },
-    {
-        id: 4,
-        icon: "🚀",
-        title: "Launch Delay Predictor",
-        tagline: "Узнайте о переносе за 72 часа",
-        description:
-            "Система мониторит все запланированные запуски, проверяет погоду на космодроме и историческую статистику ракеты. Красная шкала предупреждает о шансе задержки с объяснением причин — до официального объявления.",
-        color: "#EF4444",
-        bg: "from-[#EF4444]/10 via-transparent to-transparent",
-        stat: { label: "Горизонт прогноза", value: "72 часа" },
-    },
-    {
-        id: 5,
-        icon: "🛰",
-        title: "Orbit Optimizer",
-        tagline: "Каждый литр топлива на счету",
-        description:
-            "Укажите текущую и целевую орбиту. Система рассчитает самый экономный маршрут маневра (Маневр Гомана), скажет сколько кг топлива сгорит и переведет это в доллары. Интерактивный 3D-глобус покажет траекторию.",
-        color: "#9D4EDD",
-        bg: "from-[#9D4EDD]/10 via-transparent to-transparent",
-        stat: { label: "Экономия топлива", value: "до 40%" },
-    },
-    {
-        id: 6,
-        icon: "🎯",
-        title: "Orbit Suitability Scorer",
-        tagline: "Подходит ли орбита для вашего бизнеса?",
-        description:
-            "Введите параметры предложенной орбиты и бизнес-задачу. Система оценит по критериям: охват регионов, задержка сигнала, частота пролетов. Диаграмма-«паутина» покажет сильные и слабые стороны орбиты.",
-        color: "#10B981",
-        bg: "from-[#10B981]/10 via-transparent to-transparent",
-        stat: { label: "Метрик анализа", value: "12" },
-    },
-    {
-        id: 7,
-        icon: "🕵️",
-        title: "Failure Forensics",
-        tagline: "Найдет причину сбоя по логам",
-        description:
-            "Загрузите CSV с телеметрией — система за секунды проанализирует тысячи строк и подсветит аномальные миллисекунды. Рядом будет текстовая версия: что именно произошло и какой именно узел дал сбой.",
-        color: "#EF4444",
-        bg: "from-[#EF4444]/10 via-transparent to-transparent",
-        stat: { label: "Скорость анализа", value: "< 3 сек" },
-    },
-    {
-        id: 8,
-        icon: "🎲",
-        title: "Scenario Simulator",
-        tagline: "Проиграем ваш бизнес 10 000 раз",
-        description:
-            "Введите бюджет, стоимость запуска и целевой регион. Симулятор за секунды прогоняет 10 000 виртуальных жизней спутника с разными условиями. Конус вероятности покажет медианную прибыль и реальный риск убытка.",
-        color: "#00F0FF",
-        bg: "from-[#00F0FF]/10 via-transparent to-transparent",
-        stat: { label: "Сценариев за расчет", value: "10 000" },
-    },
-    {
-        id: 9,
-        icon: "🌿",
-        title: "ESG Assessor",
-        tagline: "Экологический паспорт миссии",
-        description:
-            "Введите параметры ракеты и орбиты — система рассчитает углеродный след, риск образования мусора и присвоит ESG-рейтинг от A+ до F. ИИ подскажет конкретные инженерные изменения для улучшения рейтинга.",
-        color: "#10B981",
-        bg: "from-[#10B981]/10 via-transparent to-transparent",
-        stat: { label: "Рейтинговая шкала", value: "A+ → F" },
-    },
-];
+import { useTranslations } from "next-intl";
 
 export default function FeaturesSection() {
+    const t = useTranslations("Features");
     const [activeId, setActiveId] = useState(0);
+
+    const modules = [
+        {
+            id: 0,
+            icon: "🌐",
+            title: t("modules.dataHub.title"),
+            tagline: t("modules.dataHub.tagline"),
+            description: t("modules.dataHub.description"),
+            color: "#00F0FF",
+            bg: "from-[#00F0FF]/10 via-transparent to-transparent",
+            stat: { label: t("modules.dataHub.statLabel"), value: t("modules.dataHub.statValue") },
+        },
+        {
+            id: 1,
+            icon: "🧠",
+            title: t("modules.missionDesigner.title"),
+            tagline: t("modules.missionDesigner.tagline"),
+            description: t("modules.missionDesigner.description"),
+            color: "#9D4EDD",
+            bg: "from-[#9D4EDD]/10 via-transparent to-transparent",
+            stat: { label: t("modules.missionDesigner.statLabel"), value: t("modules.missionDesigner.statValue") },
+        },
+        {
+            id: 2,
+            icon: "💎",
+            title: t("modules.captureValuePredictor.title"),
+            tagline: t("modules.captureValuePredictor.tagline"),
+            description: t("modules.captureValuePredictor.description"),
+            color: "#10B981",
+            bg: "from-[#10B981]/10 via-transparent to-transparent",
+            stat: { label: t("modules.captureValuePredictor.statLabel"), value: t("modules.captureValuePredictor.statValue") },
+        },
+        {
+            id: 3,
+            icon: "📄",
+            title: t("modules.reportGenerator.title"),
+            tagline: t("modules.reportGenerator.tagline"),
+            description: t("modules.reportGenerator.description"),
+            color: "#00F0FF",
+            bg: "from-[#00F0FF]/10 via-transparent to-transparent",
+            stat: { label: t("modules.reportGenerator.statLabel"), value: t("modules.reportGenerator.statValue") },
+        },
+        {
+            id: 4,
+            icon: "🚀",
+            title: t("modules.launchDelayPredictor.title"),
+            tagline: t("modules.launchDelayPredictor.tagline"),
+            description: t("modules.launchDelayPredictor.description"),
+            color: "#EF4444",
+            bg: "from-[#EF4444]/10 via-transparent to-transparent",
+            stat: { label: t("modules.launchDelayPredictor.statLabel"), value: t("modules.launchDelayPredictor.statValue") },
+        },
+        {
+            id: 5,
+            icon: "🛰",
+            title: t("modules.orbitOptimizer.title"),
+            tagline: t("modules.orbitOptimizer.tagline"),
+            description: t("modules.orbitOptimizer.description"),
+            color: "#9D4EDD",
+            bg: "from-[#9D4EDD]/10 via-transparent to-transparent",
+            stat: { label: t("modules.orbitOptimizer.statLabel"), value: t("modules.orbitOptimizer.statValue") },
+        },
+        {
+            id: 6,
+            icon: "🎯",
+            title: t("modules.orbitSuitabilityScorer.title"),
+            tagline: t("modules.orbitSuitabilityScorer.tagline"),
+            description: t("modules.orbitSuitabilityScorer.description"),
+            color: "#10B981",
+            bg: "from-[#10B981]/10 via-transparent to-transparent",
+            stat: { label: t("modules.orbitSuitabilityScorer.statLabel"), value: t("modules.orbitSuitabilityScorer.statValue") },
+        },
+        {
+            id: 7,
+            icon: "🕵️",
+            title: t("modules.failureForensics.title"),
+            tagline: t("modules.failureForensics.tagline"),
+            description: t("modules.failureForensics.description"),
+            color: "#EF4444",
+            bg: "from-[#EF4444]/10 via-transparent to-transparent",
+            stat: { label: t("modules.failureForensics.statLabel"), value: t("modules.failureForensics.statValue") },
+        },
+        {
+            id: 8,
+            icon: "🎲",
+            title: t("modules.scenarioSimulator.title"),
+            tagline: t("modules.scenarioSimulator.tagline"),
+            description: t("modules.scenarioSimulator.description"),
+            color: "#00F0FF",
+            bg: "from-[#00F0FF]/10 via-transparent to-transparent",
+            stat: { label: t("modules.scenarioSimulator.statLabel"), value: t("modules.scenarioSimulator.statValue") },
+        },
+        {
+            id: 9,
+            icon: "🌿",
+            title: t("modules.esgAssessor.title"),
+            tagline: t("modules.esgAssessor.tagline"),
+            description: t("modules.esgAssessor.description"),
+            color: "#10B981",
+            bg: "from-[#10B981]/10 via-transparent to-transparent",
+            stat: { label: t("modules.esgAssessor.statLabel"), value: t("modules.esgAssessor.statValue") },
+        },
+    ];
+
     const active = modules[activeId];
 
     return (
@@ -134,13 +127,13 @@ export default function FeaturesSection() {
                     className="text-center mb-12"
                 >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#9D4EDD]/30 bg-[#9D4EDD]/5 text-xs text-[#9D4EDD] mb-5">
-                        10 модулей
+                        {t("badge")}
                     </div>
                     <h2 className="text-4xl md:text-5xl font-semibold text-white tracking-tighter mb-4">
-                        Что умеет платформа
+                        {t("title")}
                     </h2>
                     <p className="text-white/45 text-base max-w-xl mx-auto leading-relaxed">
-                        Выберите любой модуль чтобы узнать что он делает
+                        {t("subtitle")}
                     </p>
                 </motion.div>
 

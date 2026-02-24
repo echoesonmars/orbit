@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import { Link } from "../../i18n/routing";
+import { useTranslations } from "next-intl";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const t = useTranslations("Navbar");
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -15,9 +18,9 @@ export default function Navbar() {
     }, []);
 
     const links = [
-        { label: "Продукт", href: "#features" },
-        { label: "Как работает", href: "#how-it-works" },
-        { label: "О платформе", href: "#stats" },
+        { label: t("product"), href: "#features" },
+        { label: t("howItWorks"), href: "#how-it-works" },
+        { label: t("about"), href: "#stats" },
     ];
 
     const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -64,38 +67,45 @@ export default function Navbar() {
 
                 {/* Desktop right CTA */}
                 <div className="hidden md:flex items-center gap-3 shrink-0">
+                    <LanguageSwitcher />
                     <Link
                         href="/auth/login"
                         className="text-sm text-white/55 hover:text-white px-3 py-2 transition-colors"
                     >
-                        Войти
+                        {t("login")}
                     </Link>
                     <Link
                         href="/auth/register"
                         className="text-sm px-5 py-2 rounded-md border border-[#00F0FF]/70 text-[#00F0FF] hover:bg-[#00F0FF]/10 hover:border-[#00F0FF] hover:shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all duration-300"
                     >
-                        Начать бесплатно
+                        {t("startForFree")}
                     </Link>
                 </div>
 
-                {/* Mobile hamburger */}
-                <button
-                    className="md:hidden text-white/70 hover:text-white p-1"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    aria-label="Открыть меню"
-                >
-                    <div className="flex flex-col gap-1.5 w-5">
-                        <span
-                            className={`h-px bg-current transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[7px]" : ""
-                                }`}
-                        />
-                        <span className={`h-px bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
-                        <span
-                            className={`h-px bg-current transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""
-                                }`}
-                        />
-                    </div>
-                </button>
+                {/* Mobile controls */}
+                <div className="md:hidden flex items-center gap-3">
+                    <LanguageSwitcher />
+                    <button
+                        className="text-white/70 hover:text-white p-1"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        aria-label="Открыть меню"
+                    >
+                        <div className="flex flex-col gap-1.5 w-5">
+                            <span
+                                className={`h-px bg-current transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[7px]" : ""
+                                    }`}
+                            />
+                            <span
+                                className={`h-px bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""
+                                    }`}
+                            />
+                            <span
+                                className={`h-px bg-current transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""
+                                    }`}
+                            />
+                        </div>
+                    </button>
+                </div>
             </nav>
 
             {/* Mobile dropdown */}
@@ -121,14 +131,17 @@ export default function Navbar() {
                                 </a>
                             ))}
                             <div className="pt-2 border-t border-white/10 flex flex-col gap-3">
-                                <Link href="/auth/login" className="text-white/60 text-sm hover:text-white transition-colors">
-                                    Войти
+                                <Link
+                                    href="/auth/login"
+                                    className="text-white/60 text-sm hover:text-white transition-colors"
+                                >
+                                    {t("login")}
                                 </Link>
                                 <Link
                                     href="/auth/register"
                                     className="text-sm px-5 py-2.5 rounded-md border border-[#00F0FF]/70 text-[#00F0FF] text-center hover:bg-[#00F0FF]/10 transition-all"
                                 >
-                                    Начать бесплатно
+                                    {t("startForFree")}
                                 </Link>
                             </div>
                         </div>
