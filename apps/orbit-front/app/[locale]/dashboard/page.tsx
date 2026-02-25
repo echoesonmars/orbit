@@ -1,13 +1,13 @@
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { MapPlaceholder } from "@/components/dashboard/MapPlaceholder";
 import { StatsOverlay } from "@/components/dashboard/StatsOverlay";
 import { QuickActionsPanel } from "@/components/dashboard/QuickActionsPanel";
+import { MapClient } from "@/components/dashboard/MapClient";
 
 export default function DashboardPage() {
     return (
         <>
-            {/* Layer 0: Full-screen map background */}
-            <MapPlaceholder />
+            {/* Layer 0: Full-screen interactive map (client component, Leaflet) */}
+            <MapClient />
 
             {/* Layer 1: Floating header */}
             <DashboardHeader />
