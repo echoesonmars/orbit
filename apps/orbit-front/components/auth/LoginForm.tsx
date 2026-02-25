@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 // Using base html elements since user manually installed and we don't have exact paths for their shadcn setup, 
 // wait, user said they installed shadcn components form input label button card.
 // We will use standard shadcn imports, but fallback to simple tailwind if it fails
@@ -24,7 +26,9 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 
 export function LoginForm() {
     const t = useTranslations("Auth.login");
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [authError, setAuthError] = useState("");
 
     const formSchema = z.object({
         email: z.string().email({ message: t("emailError") }),
@@ -41,14 +45,29 @@ export function LoginForm() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
-        // TODO: Supabase Auth integration logic here
-        console.log("Login attempted with:", values);
+        setAuthError(""); // clear previous errors
 
-        // Fake delay
-        setTimeout(() => {
+        try {
+            const supabase = createClient();
+            const { error } = await supabase.auth.signInWithPassword({
+                email: values.email,
+                password: values.password,
+            });
+
+            if (error) {
+                setAuthError(error.message);
+                setIsLoading(false);
+                return;
+            }
+
+            // Successful login -> route to dashboard
+            router.push("/dashboard");
+
+        } catch (err) {
+            console.error("Login failed:", err);
+            setAuthError("An unexpected error occurred");
             setIsLoading(false);
-            // Route to dashboard
-        }, 1500);
+        }
     }
 
     return (
@@ -68,6 +87,12 @@ export function LoginForm() {
                     </h1>
                     <p className="text-sm text-slate-400">{t("subtitle")}</p>
                 </div>
+
+                {authError && (
+                    <div className="mb-6 rounded-md bg-red-500/10 border border-red-500/20 p-4">
+                        <p className="text-sm text-red-400 font-medium text-center">{authError}</p>
+                    </div>
+                )}
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
