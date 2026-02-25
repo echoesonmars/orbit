@@ -169,5 +169,29 @@
     },
     "LanguageSwitcher": {
         "ariaLabel": "Тілді таңдау"
+    },
+    "Auth": {
+        "login": {
+            "titleLine1": "Қош ",
+            "titleGradient": "келдіңіз",
+            "subtitle": "OrbitAI басқару тақтасына кіріңіз",
+            "emailLabel": "Жұмыс Email",
+            "emailPlaceholder": "name@company.com",
+            "passwordLabel": "Құпия сөз",
+            "passwordPlaceholder": "••••••••",
+            "submitButton": "Жүйеге кіру",
+            "noAccount": "Аккаунтыңыз жоқ па?",
+            "requestAccess": "Өтінім қалдыру",
+            "emailError": "Дұрыс email енгізіңіз",
+            "passwordError": "Кемінде 6 таңба",
+            "backToHome": "Басты бетке"
+        },
+        "register": {
+            "titleLine1": "Жабық ",
+            "titleGradient": "платформа",
+            "description": "OrbitAI — спутниктік деректермен жұмыс істеуге арналған B2B платформа. Өздігінен тіркелу уақытша жабық.",
+            "ctaButton": "Қолжетімділік сұрау",
+            "backToLogin": "Кіру бетіне оралу"
+        }
     }
 }

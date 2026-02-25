@@ -169,5 +169,29 @@
     },
     "LanguageSwitcher": {
         "ariaLabel": "Select language"
+    },
+    "Auth": {
+        "login": {
+            "titleLine1": "Welcome ",
+            "titleGradient": "back",
+            "subtitle": "Log in to your OrbitAI dashboard",
+            "emailLabel": "Work Email",
+            "emailPlaceholder": "name@company.com",
+            "passwordLabel": "Password",
+            "passwordPlaceholder": "••••••••",
+            "submitButton": "Sign In",
+            "noAccount": "Don't have an account?",
+            "requestAccess": "Request Access",
+            "emailError": "Please enter a valid email",
+            "passwordError": "Minimum 6 characters",
+            "backToHome": "Back to Home"
+        },
+        "register": {
+            "titleLine1": "Invite-Only ",
+            "titleGradient": "Platform",
+            "description": "OrbitAI is a private B2B platform for satellite data operations. Self-registration is temporarily closed.",
+            "ctaButton": "Request Access",
+            "backToLogin": "Back to Login"
+        }
     }
 }

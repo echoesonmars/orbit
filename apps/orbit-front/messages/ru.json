@@ -169,5 +169,29 @@
     },
     "LanguageSwitcher": {
         "ariaLabel": "Выбрать язык"
+    },
+    "Auth": {
+        "login": {
+            "titleLine1": "Добро ",
+            "titleGradient": "пожаловать",
+            "subtitle": "Войдите в панель управления OrbitAI",
+            "emailLabel": "Рабочий Email",
+            "emailPlaceholder": "name@company.com",
+            "passwordLabel": "Пароль",
+            "passwordPlaceholder": "••••••••",
+            "submitButton": "Войти в систему",
+            "noAccount": "Нет аккаунта?",
+            "requestAccess": "Оставьте заявку",
+            "emailError": "Введите корректный email",
+            "passwordError": "Минимум 6 символов",
+            "backToHome": "На главную"
+        },
+        "register": {
+            "titleLine1": "Платформа ",
+            "titleGradient": "по приглашениям",
+            "description": "OrbitAI — это приватная B2B платформа для работы со спутниковыми данными. Самостоятельная регистрация временно закрыта.",
+            "ctaButton": "Запросить доступ",
+            "backToLogin": "Вернуться ко входу"
+        }
     }
 }
