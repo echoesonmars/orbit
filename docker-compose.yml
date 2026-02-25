@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: orbit-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      - ML_API_URL=http://ml-api:8000
+    depends_on:
+      - ml-api
+    networks:
+      - orbit-net
+
+  ml-api:
+    build:
+      context: ./services/ml-api
+      dockerfile: Dockerfile
+    container_name: orbit-ml-api
+    ports:
+      - "8000:8000"
+    networks:
+      - orbit-net
+
+networks:
+  orbit-net:
+    driver: bridge
