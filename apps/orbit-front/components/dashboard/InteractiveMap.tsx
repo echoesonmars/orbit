@@ -3,6 +3,9 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useMapStore } from "@/lib/store/mapStore";
 import {
     Square,
     TrendingUp,
@@ -14,6 +17,9 @@ import {
     ZoomOut,
     Satellite,
     Map,
+    Navigation,
+    Search,
+    Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,17 +28,10 @@ type BBox = {
     southWest: { lat: number; lng: number };
 };
 
-const TILE_LAYERS = {
-    satellite: {
-        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        label: "Спутник",
-        icon: Satellite,
-    },
-    dark: {
-        url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        label: "Схема",
-        icon: Map,
-    },
+type SearchResult = {
+    lat: string;
+    lon: string;
+    display_name: string;
 };
 
 export function InteractiveMap() {
@@ -42,18 +41,62 @@ export function InteractiveMap() {
     const tileLayerRef = useRef<any>(null);
     const drawControlRef = useRef<any>(null);
 
-    const [bbox, setBbox] = useState<BBox | null>(null);
-    const [isDrawing, setIsDrawing] = useState(false);
-    const [tileMode, setTileMode] = useState<"satellite" | "dark">("satellite");
+    const [isLocating, setIsLocating] = useState(false);
 
-    const clearBBox = useCallback(() => {
-        setBbox(null);
-        drawnItemsRef.current?.clearLayers();
-    }, []);
+    const t = useTranslations("Dashboard.map");
+
+    const TILE_LAYERS = {
+        satellite: {
+            url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            label: t("layerSatellite"),
+            icon: Satellite,
+        },
+        dark: {
+            url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            label: t("layerDark"),
+            icon: Map,
+        },
+    };
+
+    const {
+        bbox,
+        isDrawing,
+        tileMode,
+        targetLocation,
+        setBbox,
+        setIsDrawing,
+        setTileMode,
+        setTargetLocation,
+        clearBBox,
+    } = useMapStore();
 
     // Zoom controls
     const zoomIn = () => mapRef.current?.zoomIn();
     const zoomOut = () => mapRef.current?.zoomOut();
+
+    // Geolocation
+    const locateUser = () => {
+        if (!mapRef.current) return;
+        setIsLocating(true);
+        mapRef.current.locate({ setView: true, maxZoom: 8 });
+
+        mapRef.current.once('locationfound', () => {
+            setIsLocating(false);
+        });
+
+        mapRef.current.once('locationerror', () => {
+            setIsLocating(false);
+            alert("Could not find your location.");
+        });
+    };
+
+    // Listen to global targetLocation changes (from Header Search Bar)
+    useEffect(() => {
+        if (targetLocation && mapRef.current) {
+            mapRef.current.flyTo([targetLocation.lat, targetLocation.lon], 10);
+            setTargetLocation(null);
+        }
+    }, [targetLocation, setTargetLocation]);
 
     // Activate rectangle draw mode
     const startDraw = () => {
@@ -91,7 +134,7 @@ export function InteractiveMap() {
             tileLayerRef.current = layer;
         });
         setTileMode(mode);
-    }, []);
+    }, [setTileMode]);
 
     useEffect(() => {
         if (!mapContainerRef.current || mapRef.current) return;
@@ -147,8 +190,12 @@ export function InteractiveMap() {
             });
         };
 
-        initMap().catch(console.error);
+        const timer = setTimeout(() => {
+            initMap().catch(console.error);
+        }, 100);
+
         return () => {
+            clearTimeout(timer);
             if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
         };
     }, []);
@@ -163,7 +210,7 @@ export function InteractiveMap() {
                 {/* Draw BBox */}
                 <button
                     onClick={startDraw}
-                    title="Выделить зону"
+                    title={t("draw")}
                     className={cn(
                         "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
                         "bg-slate-900/80 backdrop-blur-md border",
@@ -178,7 +225,7 @@ export function InteractiveMap() {
                 {/* Zoom In */}
                 <button
                     onClick={zoomIn}
-                    title="Приблизить"
+                    title={t("zoomIn")}
                     className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-900/80 backdrop-blur-md border border-white/10 text-slate-400 hover:text-white hover:border-white/20 transition-all"
                 >
                     <ZoomIn className="h-5 w-5" />
@@ -187,10 +234,23 @@ export function InteractiveMap() {
                 {/* Zoom Out */}
                 <button
                     onClick={zoomOut}
-                    title="Отдалить"
+                    title={t("zoomOut")}
                     className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-900/80 backdrop-blur-md border border-white/10 text-slate-400 hover:text-white hover:border-white/20 transition-all"
                 >
                     <ZoomOut className="h-5 w-5" />
+                </button>
+
+                {/* My Location */}
+                <button
+                    onClick={locateUser}
+                    title={t("myLocation")}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-900/80 backdrop-blur-md border border-white/10 text-slate-400 hover:text-white hover:border-white/20 transition-all mt-2"
+                >
+                    {isLocating ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-cyan-400" />
+                    ) : (
+                        <Navigation className="h-5 w-5" />
+                    )}
                 </button>
 
                 {/* Tile toggle */}
@@ -221,7 +281,7 @@ export function InteractiveMap() {
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                     <div className="flex items-center gap-2 rounded-full bg-cyan-400/10 backdrop-blur-md border border-cyan-500/30 px-4 py-2">
                         <Crosshair className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-                        <span className="text-xs text-cyan-300 font-mono">Нарисуйте прямоугольник на карте</span>
+                        <span className="text-xs text-cyan-300 font-mono">{t("drawHint")}</span>
                     </div>
                 </div>
             )}
@@ -232,7 +292,7 @@ export function InteractiveMap() {
                     <div className="flex items-center gap-2 rounded-full bg-slate-900/70 backdrop-blur-md border border-white/10 px-4 py-2">
                         <Square className="h-3.5 w-3.5 text-slate-400" />
                         <span className="text-xs text-slate-400 font-mono">
-                            Используйте инструмент слева, чтобы выбрать зону
+                            {t("idleHint")}
                         </span>
                     </div>
                 </div>
@@ -246,30 +306,30 @@ export function InteractiveMap() {
                             <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-cyan-400 flex-shrink-0" />
                                 <div>
-                                    <p className="text-sm font-semibold text-white">Зона выбрана</p>
+                                    <p className="text-sm font-semibold text-white">{t("areaSelected")}</p>
                                     <p className="text-[10px] text-slate-400 font-mono mt-0.5">
                                         SW {bbox.southWest.lat.toFixed(3)}°, {bbox.southWest.lng.toFixed(3)}° →
                                         NE {bbox.northEast.lat.toFixed(3)}°, {bbox.northEast.lng.toFixed(3)}°
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={clearBBox} className="text-slate-500 hover:text-white transition-colors p-1 rounded-md hover:bg-white/5 flex-shrink-0">
+                            <button onClick={() => { clearBBox(); drawnItemsRef.current?.clearLayers(); }} className="text-slate-500 hover:text-white transition-colors p-1 rounded-md hover:bg-white/5 flex-shrink-0">
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                            <button className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-cyan-400/10 border border-cyan-500/30 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all">
+                            <Link href="/dashboard/value-predictor" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-cyan-400/10 border border-cyan-500/30 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all">
                                 <TrendingUp className="h-5 w-5 text-cyan-400" />
-                                <span className="text-[11px] font-medium text-cyan-400 text-center leading-tight">Оценить снимок</span>
-                            </button>
-                            <button className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 hover:shadow-[0_0_20px_rgba(157,78,221,0.2)] transition-all">
+                                <span className="text-[11px] font-medium text-cyan-400 text-center leading-tight">{t("btnAnalyze")}</span>
+                            </Link>
+                            <Link href="/dashboard/mission-designer" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 hover:shadow-[0_0_20px_rgba(157,78,221,0.2)] transition-all">
                                 <Crosshair className="h-5 w-5 text-purple-400" />
-                                <span className="text-[11px] font-medium text-purple-400 text-center leading-tight">Mission Designer</span>
-                            </button>
-                            <button className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
+                                <span className="text-[11px] font-medium text-purple-400 text-center leading-tight">{t("btnMission")}</span>
+                            </Link>
+                            <Link href="/dashboard/reports" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
                                 <FileText className="h-5 w-5 text-emerald-400" />
-                                <span className="text-[11px] font-medium text-emerald-400 text-center leading-tight">Отчёт PDF</span>
-                            </button>
+                                <span className="text-[11px] font-medium text-emerald-400 text-center leading-tight">{t("btnReport")}</span>
+                            </Link>
                         </div>
                     </div>
                 </div>

@@ -193,5 +193,59 @@
             "ctaButton": "Request Access",
             "backToLogin": "Back to Login"
         }
+    },
+    "Dashboard": {
+        "header": {
+            "apiOnline": "API Gateway Online",
+            "beta": "Beta v0.1",
+            "profile": "Profile",
+            "settings": "Settings",
+            "logout": "Log out"
+        },
+        "sidebar": {
+            "map": "Interactive Map",
+            "dataHub": "Data Hub",
+            "missionDesigner": "Mission Designer",
+            "valuePredictor": "Capture Value Predictor",
+            "reports": "Report Generator",
+            "launchDelay": "Launch Delay Predictor",
+            "orbitOptimizer": "Orbit Optimizer",
+            "orbitScorer": "Orbit Suitability Scorer",
+            "failureForensics": "Failure Forensics",
+            "scenarioSimulator": "Scenario Simulator",
+            "esg": "ESG Assessor",
+            "settings": "Settings",
+            "collapse": "Collapse"
+        },
+        "quickActions": {
+            "title": "Quick Launch",
+            "newMission": {
+                "title": "New Mission",
+                "desc": "Design a mission from scratch"
+            },
+            "analyze": {
+                "title": "Analyze Area",
+                "desc": "Run Capture Value Predictor"
+            },
+            "report": {
+                "title": "Generate Report",
+                "desc": "Export PDF summary"
+            }
+        },
+        "map": {
+            "drawHint": "Draw a rectangle on the map",
+            "idleHint": "Use the tool on the left to select an area",
+            "areaSelected": "Area selected",
+            "btnAnalyze": "Predict Value",
+            "btnMission": "Mission Designer",
+            "btnReport": "PDF Report",
+            "draw": "Select Area",
+            "zoomIn": "Zoom In",
+            "zoomOut": "Zoom Out",
+            "layerSatellite": "Satellite",
+            "layerDark": "Carto Dark",
+            "searchPlaceholder": "Search places...",
+            "myLocation": "My Location"
+        }
     }
 }

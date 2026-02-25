@@ -193,5 +193,59 @@
             "ctaButton": "Запросить доступ",
             "backToLogin": "Вернуться ко входу"
         }
+    },
+    "Dashboard": {
+        "header": {
+            "apiOnline": "API Gateway Активен",
+            "beta": "Бета v0.1",
+            "profile": "Профиль",
+            "settings": "Настройки",
+            "logout": "Выйти"
+        },
+        "sidebar": {
+            "map": "Интерактивная карта",
+            "dataHub": "Каталог снимков (Hub)",
+            "missionDesigner": "Генератор ТЗ (Mission)",
+            "valuePredictor": "Оценка стоимости (Predictor)",
+            "reports": "Генератор отчетов",
+            "launchDelay": "Задержки запуска ракет",
+            "orbitOptimizer": "Оптимизатор орбит",
+            "orbitScorer": "Скоринг орбит (Suitability)",
+            "failureForensics": "Анализ аномалий (Forensics)",
+            "scenarioSimulator": "Симулятор ROI (Monte-Carlo)",
+            "esg": "ESG и Экология",
+            "settings": "Настройки",
+            "collapse": "Свернуть"
+        },
+        "quickActions": {
+            "title": "Быстрый старт",
+            "newMission": {
+                "title": "Новая миссия",
+                "desc": "Спроектировать с нуля"
+            },
+            "analyze": {
+                "title": "Оценить зону",
+                "desc": "Запустить Value Predictor"
+            },
+            "report": {
+                "title": "Скачать отчет",
+                "desc": "Сгенерировать PDF"
+            }
+        },
+        "map": {
+            "drawHint": "Нарисуйте прямоугольник на карте",
+            "idleHint": "Используйте инструмент слева, чтобы выбрать зону",
+            "areaSelected": "Зона выбрана",
+            "btnAnalyze": "Оценить снимок",
+            "btnMission": "Mission Designer",
+            "btnReport": "Отчёт PDF",
+            "draw": "Выделить зону",
+            "zoomIn": "Приблизить",
+            "zoomOut": "Отдалить",
+            "layerSatellite": "Спутник",
+            "layerDark": "Схема",
+            "searchPlaceholder": "Поиск мест...",
+            "myLocation": "Где я?"
+        }
     }
 }

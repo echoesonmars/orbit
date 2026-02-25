@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
     Tooltip,
@@ -27,27 +28,28 @@ import {
     ChevronRight,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-    { id: "map", label: "Interactive Map", icon: Globe, href: "/dashboard" },
-    { id: "data-hub", label: "Data Hub", icon: Database, href: "/dashboard/data-hub" },
-    { id: "mission-designer", label: "Mission Designer", icon: Crosshair, href: "/dashboard/mission-designer" },
-    { id: "value-predictor", label: "Capture Value Predictor", icon: TrendingUp, href: "/dashboard/value-predictor" },
-    { id: "reports", label: "Report Generator", icon: FileText, href: "/dashboard/reports" },
-    { id: "launch-delay", label: "Launch Delay Predictor", icon: Satellite, href: "/dashboard/launch-delay" },
-    { id: "orbit-optimizer", label: "Orbit Optimizer", icon: BarChart3, href: "/dashboard/orbit-optimizer" },
-    { id: "orbit-scorer", label: "Orbit Suitability Scorer", icon: Target, href: "/dashboard/orbit-scorer" },
-    { id: "failure-forensics", label: "Failure Forensics", icon: AlertTriangle, href: "/dashboard/failure-forensics" },
-    { id: "scenario-simulator", label: "Scenario Simulator", icon: Cpu, href: "/dashboard/scenario-simulator" },
-    { id: "esg", label: "ESG Assessor", icon: BadgeCheck, href: "/dashboard/esg" },
-];
-
-const BOTTOM_ITEMS = [
-    { id: "settings", label: "Settings", icon: Settings, href: "/dashboard/settings" },
-];
-
 export function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const pathname = usePathname();
+    const t = useTranslations("Dashboard.sidebar");
+
+    const NAV_ITEMS = [
+        { id: "map", label: t("map"), icon: Globe, href: "/dashboard" },
+        { id: "data-hub", label: t("dataHub"), icon: Database, href: "/dashboard/data-hub" },
+        { id: "mission-designer", label: t("missionDesigner"), icon: Crosshair, href: "/dashboard/mission-designer" },
+        { id: "value-predictor", label: t("valuePredictor"), icon: TrendingUp, href: "/dashboard/value-predictor" },
+        { id: "reports", label: t("reports"), icon: FileText, href: "/dashboard/reports" },
+        { id: "launch-delay", label: t("launchDelay"), icon: Satellite, href: "/dashboard/launch-delay" },
+        { id: "orbit-optimizer", label: t("orbitOptimizer"), icon: BarChart3, href: "/dashboard/orbit-optimizer" },
+        { id: "orbit-scorer", label: t("orbitScorer"), icon: Target, href: "/dashboard/orbit-scorer" },
+        { id: "failure-forensics", label: t("failureForensics"), icon: AlertTriangle, href: "/dashboard/failure-forensics" },
+        { id: "scenario-simulator", label: t("scenarioSimulator"), icon: Cpu, href: "/dashboard/scenario-simulator" },
+        { id: "esg", label: t("esg"), icon: BadgeCheck, href: "/dashboard/esg" },
+    ];
+
+    const BOTTOM_ITEMS = [
+        { id: "settings", label: t("settings"), icon: Settings, href: "/dashboard/settings" },
+    ];
 
     const isActive = (href: string) => {
         if (href === "/dashboard") return pathname.endsWith("/dashboard");
@@ -144,33 +146,35 @@ export function Sidebar() {
                         ) : (
                             <>
                                 <ChevronLeft className="h-4 w-4" />
-                                <span className="text-xs">Collapse</span>
+                                <span className="text-xs">{t("collapse")}</span>
                             </>
                         )}
                     </button>
                 </div>
             </aside>
 
-            {/* Mobile Bottom Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 h-16 bg-slate-900/80 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2">
-                {NAV_ITEMS.slice(0, 5).map((item) => {
-                    const active = isActive(item.href);
-                    return (
-                        <Link
-                            key={item.id}
-                            href={item.href}
-                            className={cn(
-                                "flex flex-col items-center gap-1 p-2 rounded-md transition-all",
-                                active ? "text-cyan-400" : "text-slate-500"
-                            )}
-                        >
-                            <item.icon className="h-5 w-5" />
-                            <span className="text-[10px] font-medium truncate max-w-[48px] text-center leading-none">
-                                {item.label.split(" ")[0]}
-                            </span>
-                        </Link>
-                    );
-                })}
+            {/* Mobile Bottom Navigation (Scrollable) */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 h-16 bg-slate-900/80 backdrop-blur-md border-t border-white/10 flex items-center overflow-x-auto overflow-y-hidden px-2 no-scrollbar snap-x">
+                <div className="flex items-center gap-2 min-w-max mx-auto px-2">
+                    {NAV_ITEMS.map((item) => {
+                        const active = isActive(item.href);
+                        return (
+                            <Link
+                                key={item.id}
+                                href={item.href}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-all snap-center w-16",
+                                    active ? "text-cyan-400" : "text-slate-500"
+                                )}
+                            >
+                                <item.icon className="h-5 w-5" />
+                                <span className="text-[10px] font-medium truncate w-full text-center leading-none">
+                                    {item.label.split(" ")[0]}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </nav>
         </TooltipProvider>
     );
