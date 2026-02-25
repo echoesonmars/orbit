@@ -12,14 +12,16 @@ import {
 } from "@/components/ui/tooltip";
 import {
     Globe,
+    Database,
     Crosshair,
     TrendingUp,
     FileText,
     Satellite,
     BarChart3,
-    BadgeCheck,
+    Target,
     AlertTriangle,
     Cpu,
+    BadgeCheck,
     Settings,
     ChevronLeft,
     ChevronRight,
@@ -27,14 +29,16 @@ import {
 
 const NAV_ITEMS = [
     { id: "map", label: "Interactive Map", icon: Globe, href: "/dashboard" },
+    { id: "data-hub", label: "Data Hub", icon: Database, href: "/dashboard/data-hub" },
     { id: "mission-designer", label: "Mission Designer", icon: Crosshair, href: "/dashboard/mission-designer" },
-    { id: "value-predictor", label: "Value Predictor", icon: TrendingUp, href: "/dashboard/value-predictor" },
+    { id: "value-predictor", label: "Capture Value Predictor", icon: TrendingUp, href: "/dashboard/value-predictor" },
     { id: "reports", label: "Report Generator", icon: FileText, href: "/dashboard/reports" },
     { id: "launch-delay", label: "Launch Delay Predictor", icon: Satellite, href: "/dashboard/launch-delay" },
     { id: "orbit-optimizer", label: "Orbit Optimizer", icon: BarChart3, href: "/dashboard/orbit-optimizer" },
-    { id: "esg", label: "ESG Assessor", icon: BadgeCheck, href: "/dashboard/esg" },
+    { id: "orbit-scorer", label: "Orbit Suitability Scorer", icon: Target, href: "/dashboard/orbit-scorer" },
     { id: "failure-forensics", label: "Failure Forensics", icon: AlertTriangle, href: "/dashboard/failure-forensics" },
     { id: "scenario-simulator", label: "Scenario Simulator", icon: Cpu, href: "/dashboard/scenario-simulator" },
+    { id: "esg", label: "ESG Assessor", icon: BadgeCheck, href: "/dashboard/esg" },
 ];
 
 const BOTTOM_ITEMS = [
