@@ -11,8 +11,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
+# Fix permissions and Build TypeScript
+RUN chmod +x node_modules/.bin/tsc && npm run build
 
 # Expose port
 EXPOSE 3001
