@@ -1,7 +1,54 @@
 from pystac_client import Client
 import datetime
+import os
+import json
 
 EARTH_SEARCH_API_URL = "https://earth-search.aws.element84.com/v1"
+
+# ─── Supabase Client (lazy init) ─────────────────────────────────────────────
+_supabase_client = None
+
+def _get_supabase():
+    global _supabase_client
+    if _supabase_client is None:
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        if url and key:
+            from supabase import create_client
+            _supabase_client = create_client(url, key)
+    return _supabase_client
+
+
+def _save_scenes_to_db(scenes: list[dict], bbox: list[float]):
+    """Save/upsert scenes to Supabase satellite_scenes table (fire-and-forget)."""
+    try:
+        sb = _get_supabase()
+        if not sb:
+            return
+
+        rows = []
+        for s in scenes:
+            rows.append({
+                "scene_id": s["id"],
+                "captured_at": f'{s["date"]}T00:00:00Z' if s["date"] else None,
+                "cloud_cover": s["cloudCover"],
+                "sensor_type": s["sensor"],
+                "thumbnail_url": s["thumbnail"],
+                "estimated_price": s["price"],
+                "bbox": json.dumps(bbox),
+                "metadata": json.dumps({
+                    "ndvi": s["ndvi"],
+                    "fullres": s["fullres"],
+                })
+            })
+
+        if rows:
+            # Upsert: if scene_id already exists, update it; otherwise insert
+            sb.table("satellite_scenes").upsert(rows, on_conflict="scene_id").execute()
+            print(f"[DataHub] Saved {len(rows)} scenes to Supabase")
+    except Exception as e:
+        # Don't crash the search if DB save fails
+        print(f"[DataHub] Warning: failed to save scenes to DB: {e}")
 
 
 def _calculate_scene_price(cloud_cover: float, date_str: str, gsd_meters: float = 10.0) -> float:
@@ -10,50 +57,44 @@ def _calculate_scene_price(cloud_cover: float, date_str: str, gsd_meters: float 
     Based on real market rates: Sentinel-class archive = $5-$20/scene,
     commercial high-res tasking = $50-$150/scene.
     """
-    # Base price per scene (not per km²!)
-    base = 12.0  # Average archive scene price
+    base = 12.0
 
-    # Resolution tier
     if gsd_meters < 1.0:
-        base = 80.0    # Commercial high-res (Maxar/Airbus class)
+        base = 80.0
     elif gsd_meters < 5.0:
-        base = 35.0    # Medium-res commercial
-    # else: default $12 for 10m+ (Sentinel class)
+        base = 35.0
 
-    # Freshness bonus
     if date_str:
         try:
             item_date = datetime.datetime.strptime(date_str.split("T")[0], "%Y-%m-%d")
             age_days = (datetime.datetime.now() - item_date).days
             if age_days <= 2:
-                base *= 2.5   # Very fresh = premium
+                base *= 2.5
             elif age_days <= 7:
                 base *= 1.6
             elif age_days <= 30:
                 base *= 1.2
             elif age_days > 365:
-                base *= 0.6   # Old archive = discount
+                base *= 0.6
         except ValueError:
             pass
 
-    # Cloud cover adjustment
     if cloud_cover < 5.0:
-        base *= 1.4    # Crystal clear = premium
+        base *= 1.4
     elif cloud_cover > 50.0:
-        base *= 0.3    # Mostly clouds = heavy discount
+        base *= 0.3
 
-    return round(max(3.0, min(base, 200.0)), 2)  # Clamp to $3 - $200
+    return round(max(3.0, min(base, 200.0)), 2)
 
 
 def search_scenes(bbox: list[float], max_cloud_cover: int = 100, max_items: int = 100) -> list[dict]:
     """
     Searches for satellite scenes using the STAC API (Earth Search v1).
-    Returns up to max_items results with preview images and commercial pricing.
+    Returns up to max_items results and saves them to Supabase automatically.
     """
     try:
         client = Client.open(EARTH_SEARCH_API_URL)
 
-        # Search Sentinel-2 archive up to 3 years back
         end_date = datetime.datetime.now()
         start_date = end_date - datetime.timedelta(days=1095)
         time_range = f"{start_date.strftime('%Y-%m-%dT%H:%M:%SZ')}/{end_date.strftime('%Y-%m-%dT%H:%M:%SZ')}"
@@ -73,31 +114,23 @@ def search_scenes(bbox: list[float], max_cloud_cover: int = 100, max_items: int 
             props = item.properties
             assets = item.assets
 
-            # ── Thumbnail (low-res, for grid cards) ──
             thumbnail_url = ""
             if "thumbnail" in assets:
                 thumbnail_url = assets["thumbnail"].href
             elif "rendered_preview" in assets:
                 thumbnail_url = assets["rendered_preview"].href
 
-            # ── Full-quality preview (for lightbox) ──
-            # rendered_preview is a browser-viewable PNG (~1000px)
-            # "visual" is a GeoTIFF (.tif) which browsers CANNOT display
             fullres_url = ""
             if "rendered_preview" in assets:
                 fullres_url = assets["rendered_preview"].href
             elif "thumbnail" in assets:
                 fullres_url = assets["thumbnail"].href
 
-            # ── Metadata ──
             cloud_cover = props.get("eo:cloud_cover", 0)
             date_str = props.get("datetime", "")
             gsd = props.get("gsd", 10.0)
 
-            # ── Price (per scene, reasonable range) ──
             price = _calculate_scene_price(cloud_cover, date_str, gsd)
-
-            # ── NDVI estimate from cloud cover ──
             ndvi_estimate = round(0.35 + (0.45 * (100 - cloud_cover) / 100), 2)
 
             results.append({
@@ -110,6 +143,9 @@ def search_scenes(bbox: list[float], max_cloud_cover: int = 100, max_items: int 
                 "fullres": fullres_url,
                 "price": price,
             })
+
+        # ── Auto-save to Supabase (fire-and-forget) ──
+        _save_scenes_to_db(results, bbox)
 
         return results
 
