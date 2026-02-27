@@ -274,7 +274,10 @@
             "cardOrbit": "Orbit Type",
             "cardSensor": "Sensor payload",
             "cardResolution": "Resolution (GSD)",
-            "reasoning": "Engineer's Reasoning"
+            "cardBudget": "Estimated Mission Budget",
+            "reasoning": "Engineer's Reasoning",
+            "chatInputPlaceholder": "Add a follow-up constraint (e.g. 'Make it cheaper', 'Needs to work at night')",
+            "chatInputInitial": "E.g., I want to count cars in Walmart parking lots in sunny states..."
         }
     }
 }

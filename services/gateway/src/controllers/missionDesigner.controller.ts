@@ -5,26 +5,48 @@ const ML_API_URL = process.env.ML_API_URL || 'http://localhost:8000';
 
 export const designMission = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { prompt } = req.body;
+        const { messages } = req.body;
 
-        if (!prompt || typeof prompt !== 'string') {
-            res.status(400).json({ error: 'Valid prompt string is required' });
+        if (!messages || !Array.isArray(messages)) {
+            res.status(400).json({ error: 'Valid messages array is required' });
             return;
         }
 
-        console.log(`[Gateway] Forwarding Mission Designer request to ML-API. Prompt length: ${prompt.length}`);
+        console.log(`[Gateway] Forwarding Mission Designer request to ML-API. Initializing stream...`);
 
-        // Forward to Python ML-API
+        // Forward to Python ML-API requesting a stream
         const response = await axios.post(`${ML_API_URL}/api/v1/mission-designer/generate`, {
-            prompt: prompt
+            messages: messages
+        }, {
+            responseType: 'stream'
         });
 
-        res.status(200).json(response.data);
+        // Set headers for Server-Sent Events
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+
+        // Pass the stream chunks directly from Python to the Next.js client
+        response.data.on('data', (chunk: Buffer) => {
+            res.write(chunk);
+        });
+
+        response.data.on('end', () => {
+            res.end();
+        });
+
+        response.data.on('error', (err: any) => {
+            console.error('[Gateway] Stream error:', err);
+            res.end();
+        });
 
     } catch (error: any) {
         console.error('[Gateway] Error in designMission forwarding:', error.message);
-        if (error.response) {
-            res.status(error.response.status).json(error.response.data);
+        if (error.response && error.response.status) {
+            res.status(error.response.status).json({
+                error: `ML-API returned status ${error.response.status}`
+            });
         } else {
             res.status(500).json({ error: 'Internal Server Error forwarding to ML-API' });
         }

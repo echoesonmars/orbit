@@ -8,6 +8,7 @@ class MissionSpec(BaseModel):
     resolution_meters: float = Field(description="The ground sample distance (GSD) resolution in meters.")
     sensor_type: str = Field(description="The type of sensor required (e.g. Optical RGB, Multispectral, SAR (Radar), Thermal).")
     explanation: str = Field(description="A brief explanation of why these technical parameters were chosen based on the user's business scenario.")
+    estimated_budget_usd: int = Field(description="A rough estimate of the mission budget in USD based on standard commercial prices.")
 
 # Read from .env file or environment variable
 # If we deploy via Railway, we need to add OPENAI_API_KEY there too
@@ -22,43 +23,51 @@ RULES:
 3. If they need broad agricultural monitoring (e.g., crop health, NDVI, forestry), assign a Multispectral sensor with medium resolution (e.g., 10m - 30m).
 4. If they need weather or continent monitoring, assign a Geostationary orbit with very low resolution (e.g., 1000m+).
 5. Provide a strong technical explanation justifying your choices.
-6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these four keys:
+6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these five keys:
 {
   "orbit_type": "string",
   "resolution_meters": float,
   "sensor_type": "string",
-  "explanation": "string"
+  "explanation": "string",
+  "estimated_budget_usd": integer
 }
 Do not use markdown formatting like ```json```.
+7. YOU MUST respond in the exactly same language that the user used in their prompt (e.g. if the user writes in Russian, write the explanation and string values in Russian. If Kazakh, use Kazakh. If English, use English).
 """
 
-def generate_mission_spec(user_prompt: str) -> dict:
+def generate_mission_spec(messages_history: list) -> any:
     """
-    Sends the user's business scenario to OpenAI to generate a technical mission specification.
+    Sends the user's chat history to OpenAI to generate a technical mission specification as a stream.
     """
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set in Railway (or .env). Cannot run mission designer.")
 
     client = OpenAI(api_key=api_key)
 
+    # Prepend the system prompt if the chat history doesn't already have one
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for msg in messages_history:
+        messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo", # Using 3.5-turbo for speed and cost-effectiveness
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Scenario: {user_prompt}\nGenerate the technical specification in JSON format."}
-            ],
+        response_stream = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
             response_format={ "type": "json_object" },
-            temperature=0.2 # Lower temperature for more deterministic/technical output
+            temperature=0.2,
+            stream=True # Streaming enabled!
         )
         
-        result_content = response.choices[0].message.content
-        if not result_content:
-            raise ValueError("Empty response from OpenAI")
-            
-        return json.loads(result_content)
+        # Async generator pattern for FastAPI StreamingResponse
+        async def event_generator():
+            for chunk in response_stream:
+                content = chunk.choices[0].delta.content
+                if content is not None:
+                    # Yield raw string fragments
+                    yield content
+
+        return event_generator()
         
     except Exception as e:
         print(f"Error in generate_mission_spec: {e}")
-        # Throw it to the endpoint to catch
         raise e
