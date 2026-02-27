@@ -114,17 +114,32 @@ def search_scenes(bbox: list[float], max_cloud_cover: int = 100, max_items: int 
             props = item.properties
             assets = item.assets
 
+            # ── Thumbnail (small, for grid cards) ──
             thumbnail_url = ""
             if "thumbnail" in assets:
                 thumbnail_url = assets["thumbnail"].href
             elif "rendered_preview" in assets:
                 thumbnail_url = assets["rendered_preview"].href
 
+            # ── Full-quality image (for lightbox) ──
+            # Priority 1: Official rendered_preview (Stable, no rate limits, usually ~1024px)
+            # Priority 2: Titiler (High-res 2048px, but has rate limits - good for Wow-effect)
+            # Priority 3: Thumbnail fallback
             fullres_url = ""
-            if "rendered_preview" in assets:
-                fullres_url = assets["rendered_preview"].href
-            elif "thumbnail" in assets:
-                fullres_url = assets["thumbnail"].href
+            
+            # Official high-quality preview (Safe & Fast)
+            official_preview = assets.get("rendered_preview", {}).get("href")
+            
+            if official_preview:
+                fullres_url = official_preview
+            elif "visual" in assets:
+                from urllib.parse import quote
+                # Using community Titiler for demo. For production, host your own instance!
+                cog_url = assets["visual"].href
+                fullres_url = f"https://titiler.xyz/cog/preview.png?url={quote(cog_url, safe='')}&max_size=2048"
+            
+            if not fullres_url:
+                fullres_url = thumbnail_url
 
             cloud_cover = props.get("eo:cloud_cover", 0)
             date_str = props.get("datetime", "")
