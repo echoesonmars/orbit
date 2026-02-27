@@ -22,7 +22,10 @@ async def predict_value_endpoint(request: PredictValueRequest):
 
         return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        print(f"[ML-API] Error in predict_value_endpoint: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Engine Error: {str(e)}")
 
 
 def _save_prediction(result: dict, request: PredictValueRequest):

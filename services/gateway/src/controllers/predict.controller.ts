@@ -40,7 +40,7 @@ export const getPrediction = async (req: Request, res: Response): Promise<void> 
 
         // 3. Forward to ML-API
         console.log(`[Gateway] Forwarding predict request to ML-API (area: ${Math.round(areakm2)} km²)`);
-        const mlResponse = await axios.post(`${ML_API_URL}/predict/value`, data, {
+        const mlResponse = await axios.post(`${ML_API_URL}/api/v1/predict/value`, data, {
             headers: { 'Content-Type': 'application/json' },
             timeout: 10_000,
         });

@@ -66,16 +66,18 @@ def check_crisis_zone(bbox: list[float], lookback_days: int = 14) -> dict:
                     continue
                 
                 # Point events: [lon, lat]
-                if geometry.get("type") == "Point":
+                if geometry.get("type") == "Point" and len(coords) >= 2:
                     lon, lat = coords[0], coords[1]
                     if (min_lon <= lon <= max_lon) and (min_lat <= lat <= max_lat):
                         result["is_crisis"] = True
                         result["events"].append(event.get("title", "Unknown Event"))
                         break
                 # Polygon/track events: [[lon, lat], ...]
-                elif geometry.get("type") == "Polygon" and coords:
-                    for point in coords[0]:
-                        if len(point) >= 2:
+                elif geometry.get("type") in ["Polygon", "LineString"] and coords:
+                    # Some polygons are deeply nested [[[lon, lat], ...]]
+                    points = coords[0] if isinstance(coords[0], list) and isinstance(coords[0][0], list) else coords
+                    for point in points:
+                        if isinstance(point, list) and len(point) >= 2:
                             lon, lat = point[0], point[1]
                             if (min_lon <= lon <= max_lon) and (min_lat <= lat <= max_lat):
                                 result["is_crisis"] = True
