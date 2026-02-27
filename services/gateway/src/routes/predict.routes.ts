@@ -6,6 +6,7 @@ import { generateReport, getReportStatus } from '../controllers/reports.controll
 import { getUpcomingLaunches, predictDelay } from '../controllers/launches.controller';
 import { optimizeOrbit } from '../controllers/orbits.controller';
 import { getGoalProfiles, scoreOrbit } from '../controllers/scores.controller';
+import { analyzeForensics, csvUpload } from '../controllers/forensics.controller';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -33,5 +34,8 @@ router.post('/orbits/optimize', requireAuth, optimizeOrbit);
 // Orbit Scorer
 router.get('/orbits/goals', requireAuth, getGoalProfiles);
 router.post('/orbits/score', requireAuth, scoreOrbit);
+
+// Failure Forensics (CSV upload)
+router.post('/forensics/analyze', requireAuth, csvUpload.single('file'), analyzeForensics);
 
 export default router;
