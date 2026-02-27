@@ -5,10 +5,11 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     ChevronLeft, DollarSign, Loader2, AlertCircle,
-    TrendingUp, MapPin, Cloud, Satellite, Zap, Globe, Flame, Sun, Radio
+    TrendingUp, MapPin, Cloud, Satellite, Zap, Globe, Flame, Sun, Radio, FileText
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { ReportModal } from "./ReportModal";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ function ValuePredictorInner() {
     const [result, setResult] = useState<PredictionResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showReportModal, setShowReportModal] = useState(false);
 
     const handlePredict = async () => {
         if (!bboxArr) return;
@@ -148,7 +150,7 @@ function ValuePredictorInner() {
         ? Math.max(...result.factors.map(f => Math.abs(f.impact)), 1)
         : 1;
 
-    return (
+    const content = (
         <div className="absolute inset-0 z-30 bg-[#0A0E17]/95 backdrop-blur-3xl flex overflow-hidden">
             {/* Main area */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -451,6 +453,15 @@ function ValuePredictorInner() {
                                 <p className="text-[10px] text-slate-600 text-center">
                                     Powered by NASA EONET &amp; DONKI · Math Engine v1
                                 </p>
+
+                                {/* Generate Report CTA */}
+                                <button
+                                    onClick={() => setShowReportModal(true)}
+                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/10 transition-all"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    Generate PDF Report
+                                </button>
                             </div>
                         )}
 
@@ -475,6 +486,28 @@ function ValuePredictorInner() {
                 </div>
             </div>
         </div>
+    );
+
+    return (
+        <>
+            {content}
+            {showReportModal && result && (
+                <ReportModal
+                    onClose={() => setShowReportModal(false)}
+                    predictionData={{
+                        bbox: bboxArr!,
+                        target,
+                        value_usd: result.value_usd,
+                        confidence: result.confidence,
+                        area_km2: result.area_km2,
+                        factors: result.factors,
+                        cloud_cover_used: result.cloud_cover_used ?? 20,
+                        weather_source: result.weather_source ?? "Manual Input",
+                        nasa: result.nasa,
+                    }}
+                />
+            )}
+        </>
     );
 }
 
