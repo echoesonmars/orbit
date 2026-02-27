@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Crosshair, TrendingUp, FileText, Plus } from "lucide-react";
+import { Crosshair, TrendingUp, FileText, Plus, Rocket } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { cn } from "@/lib/utils";
 import { useMapStore } from "@/lib/store/mapStore";
@@ -47,6 +47,15 @@ export function QuickActionsPanel() {
             href: "/dashboard/reports",
             accent: "text-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]",
             border: "hover:border-emerald-500/40",
+            active: false,
+        },
+        {
+            label: "Launches",
+            description: "Track & predict delays",
+            icon: Rocket,
+            href: "/dashboard/launch-delay",
+            accent: "text-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)]",
+            border: "hover:border-orange-500/40",
             active: false,
         },
     ];
