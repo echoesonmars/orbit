@@ -13,11 +13,13 @@ declare global {
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-    console.warn('[Warning] SUPABASE_URL or SUPABASE_ANON_KEY is not set. Auth middleware might fail.');
-}
+let supabase: ReturnType<typeof createClient> | null = null;
 
-const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+} else {
+    console.warn('[Warning] SUPABASE_URL or SUPABASE_ANON_KEY is not set. Auth middleware will reject all requests.');
+}
 
 export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -29,6 +31,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
         }
 
         const token = authHeader.split(' ')[1];
+
+        // Ensure Supabase is configured
+        if (!supabase) {
+            res.status(500).json({ error: 'Authentication service not configured (missing env vars)' });
+            return;
+        }
 
         // Verify the JWT token with Supabase
         const { data: { user }, error } = await supabase.auth.getUser(token);
