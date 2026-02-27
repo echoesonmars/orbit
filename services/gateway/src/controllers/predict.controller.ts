@@ -4,11 +4,21 @@ import axios from 'axios';
 
 const ML_API_URL = process.env.ML_API_URL || 'http://localhost:8000';
 
+// Max area = 2 million km² (roughly the size of Mexico) — prevents abuse
+const MAX_AREA_KM2 = 2_000_000;
+
+function bboxAreaKm2(bbox: number[]): number {
+    const [minLng, minLat, maxLng, maxLat] = bbox;
+    const latMid = ((minLat + maxLat) / 2) * (Math.PI / 180);
+    const dx = Math.abs(maxLng - minLng) * Math.cos(latMid) * 111.32;
+    const dy = Math.abs(maxLat - minLat) * 111.32;
+    return dx * dy;
+}
+
 export const getPrediction = async (req: Request, res: Response): Promise<void> => {
     try {
         // 1. Zod Validation
         const parsedBody = PredictValueSchema.safeParse(req.body);
-
         if (!parsedBody.success) {
             res.status(400).json({
                 error: 'Validation failed',
@@ -17,26 +27,28 @@ export const getPrediction = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        // 2. Mocking Call to internal ML-API via Axios
-        // In a real scenario, this would be: await axios.post(`${ML_API_URL}/predict/value`, parsedBody.data);
-        console.log(`[Gateway] Received valid request, forwarding to ML-API: ${JSON.stringify(parsedBody.data)}`);
+        const data = parsedBody.data;
 
-        const mockResponse = {
-            value_score: 85.5,
-            factors: [
-                { name: "cloud_cover", impact: -5 },
-                { name: "target_demand", impact: 20 }
-            ],
-            bbox: parsedBody.data.bbox
-        };
+        // 2. Area guard (prevent absurdly large requests)
+        const areakm2 = bboxAreaKm2(data.bbox);
+        if (areakm2 > MAX_AREA_KM2) {
+            res.status(400).json({
+                error: `Bounding box too large. Max allowed: ${MAX_AREA_KM2.toLocaleString()} km². Got: ${Math.round(areakm2).toLocaleString()} km².`
+            });
+            return;
+        }
 
-        // Simulating network delay
-        setTimeout(() => {
-            res.status(200).json(mockResponse);
-        }, 800);
+        // 3. Forward to ML-API
+        console.log(`[Gateway] Forwarding predict request to ML-API (area: ${Math.round(areakm2)} km²)`);
+        const mlResponse = await axios.post(`${ML_API_URL}/predict/value`, data, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10_000,
+        });
 
-    } catch (error) {
-        console.error('[Gateway] Error in getPrediction:', error);
+        res.status(200).json(mlResponse.data);
+
+    } catch (error: any) {
+        console.error('[Gateway] Error in getPrediction:', error?.response?.data || error.message);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };

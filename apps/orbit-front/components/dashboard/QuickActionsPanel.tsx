@@ -13,10 +13,13 @@ export function QuickActionsPanel() {
     const t = useTranslations("Dashboard.quickActions");
     const { bbox } = useMapStore();
 
-    // Build the mission designer href with optional bbox params
-    const missionDesignerHref = bbox
-        ? `/dashboard/mission-designer?swLat=${bbox.southWest.lat.toFixed(5)}&swLng=${bbox.southWest.lng.toFixed(5)}&neLat=${bbox.northEast.lat.toFixed(5)}&neLng=${bbox.northEast.lng.toFixed(5)}`
-        : "/dashboard/mission-designer";
+    // Build hrefs with optional bbox params
+    const bboxParams = bbox
+        ? `?swLat=${bbox.southWest.lat.toFixed(5)}&swLng=${bbox.southWest.lng.toFixed(5)}&neLat=${bbox.northEast.lat.toFixed(5)}&neLng=${bbox.northEast.lng.toFixed(5)}`
+        : "";
+
+    const missionDesignerHref = `/dashboard/mission-designer${bboxParams}`;
+    const valuePredictorHref = `/dashboard/value-predictor${bboxParams}`;
 
     const ACTIONS = [
         {
@@ -32,7 +35,7 @@ export function QuickActionsPanel() {
             label: t("analyze.title"),
             description: t("analyze.desc"),
             icon: Crosshair,
-            href: "/dashboard/value-predictor",
+            href: valuePredictorHref,
             accent: "text-purple-400 hover:shadow-[0_0_20px_rgba(157,78,221,0.3)]",
             border: "hover:border-purple-500/40",
             active: false,
