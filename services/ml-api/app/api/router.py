@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.endpoints import predict, data_hub, mission_designer, reports, launches, orbits, scores, forensics
+from app.api.endpoints import predict, data_hub, mission_designer, reports, launches, orbits, scores, forensics, simulator
 
 router = APIRouter()
 router.include_router(predict.router, prefix="/api/v1", tags=["Predictions"])
@@ -10,3 +10,4 @@ router.include_router(launches.router, prefix="/api/v1", tags=["Launches"])
 router.include_router(orbits.router, prefix="/api/v1", tags=["Orbits"])
 router.include_router(scores.router, prefix="/api/v1", tags=["Scores"])
 router.include_router(forensics.router, prefix="/api/v1", tags=["Forensics"])
+router.include_router(simulator.router, prefix="/api/v1", tags=["Simulator"])

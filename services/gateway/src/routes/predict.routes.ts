@@ -7,6 +7,7 @@ import { getUpcomingLaunches, predictDelay } from '../controllers/launches.contr
 import { optimizeOrbit } from '../controllers/orbits.controller';
 import { getGoalProfiles, scoreOrbit } from '../controllers/scores.controller';
 import { analyzeForensics, csvUpload } from '../controllers/forensics.controller';
+import { runSimulation } from '../controllers/simulator.controller';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -37,5 +38,8 @@ router.post('/orbits/score', requireAuth, scoreOrbit);
 
 // Failure Forensics (CSV upload)
 router.post('/forensics/analyze', requireAuth, csvUpload.single('file'), analyzeForensics);
+
+// Scenario Simulator
+router.post('/simulator/run', requireAuth, runSimulation);
 
 export default router;
