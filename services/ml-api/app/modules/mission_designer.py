@@ -22,7 +22,14 @@ RULES:
 3. If they need broad agricultural monitoring (e.g., crop health, NDVI, forestry), assign a Multispectral sensor with medium resolution (e.g., 10m - 30m).
 4. If they need weather or continent monitoring, assign a Geostationary orbit with very low resolution (e.g., 1000m+).
 5. Provide a strong technical explanation justifying your choices.
-6. YOU MUST ONLY RETURN A VALID JSON object matching the `MissionSpec` schema, and no other text.
+6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these four keys:
+{
+  "orbit_type": "string",
+  "resolution_meters": float,
+  "sensor_type": "string",
+  "explanation": "string"
+}
+Do not use markdown formatting like ```json```.
 """
 
 def generate_mission_spec(user_prompt: str) -> dict:
