@@ -245,7 +245,26 @@
             "layerSatellite": "Спутник",
             "layerDark": "Схема",
             "searchPlaceholder": "Поиск мест...",
-            "myLocation": "Где я?"
+            "myLocation": "Где я?",
+            "btnDataHub": "Снимки"
+        },
+        "dataHub": {
+            "title": "Каталог Снимков",
+            "subtitle": "Найдите доступные снимки для выделенной зоны",
+            "emptyTitle": "Зона не указана",
+            "emptyDesc": "Пожалуйста, выделите зону (BBox) на Интерактивной Карте, чтобы искать снимки в этом регионе.",
+            "emptyBtn": "Вернуться к Карте",
+            "searchBtn": "Найти снимки",
+            "loadingData": "Опрашиваем космические каталоги...",
+            "resultsFound": "Найдено снимков: {count}",
+            "labels": {
+                "date": "Дата съемки",
+                "cloudCover": "Облачность",
+                "ndvi": "Ср. NDVI",
+                "sensor": "Спутник"
+            },
+            "viewDetails": "Открыть метаданные",
+            "buyScene": "Купить снимок"
         }
     }
 }

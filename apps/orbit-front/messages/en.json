@@ -245,7 +245,26 @@
             "layerSatellite": "Satellite",
             "layerDark": "Carto Dark",
             "searchPlaceholder": "Search places...",
-            "myLocation": "My Location"
+            "myLocation": "My Location",
+            "btnDataHub": "Imagery Hub"
+        },
+        "dataHub": {
+            "title": "Satellite Imagery Hub",
+            "subtitle": "Discover available captures for your selected area",
+            "emptyTitle": "No area selected",
+            "emptyDesc": "Please draw a bounding box (BBox) on the Interactive Map to search for satellite imagery in this region.",
+            "emptyBtn": "Go to Map",
+            "searchBtn": "Search Images",
+            "loadingData": "Querying space catalogs...",
+            "resultsFound": "{count} scenes found",
+            "labels": {
+                "date": "Capture Date",
+                "cloudCover": "Cloud Cover",
+                "ndvi": "Avg NDVI",
+                "sensor": "Sensor"
+            },
+            "viewDetails": "View Metadata",
+            "buyScene": "Purchase Scene"
         }
     }
 }

@@ -19,7 +19,8 @@ import {
     Map,
     Navigation,
     Search,
-    Loader2
+    Loader2,
+    Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -317,7 +318,11 @@ export function InteractiveMap() {
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <Link href="/dashboard/data-hub" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all">
+                                <Database className="h-5 w-5 text-orange-400" />
+                                <span className="text-[11px] font-medium text-orange-400 text-center leading-tight">{t("btnDataHub")}</span>
+                            </Link>
                             <Link href="/dashboard/value-predictor" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-cyan-400/10 border border-cyan-500/30 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all">
                                 <TrendingUp className="h-5 w-5 text-cyan-400" />
                                 <span className="text-[11px] font-medium text-cyan-400 text-center leading-tight">{t("btnAnalyze")}</span>

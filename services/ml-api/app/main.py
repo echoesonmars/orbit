@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.endpoints import predict
+from app.api import router as api_router
 
 app = FastAPI(
     title="OrbitAI ML-API",
@@ -8,7 +8,7 @@ app = FastAPI(
 )
 
 # Connect endpoints
-app.include_router(predict.router, prefix="/api/v1", tags=["Predictions"])
+app.include_router(api_router.router)
 
 @app.get("/health", tags=["Health"])
 async def health_check():
