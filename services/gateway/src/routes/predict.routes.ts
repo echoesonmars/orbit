@@ -4,6 +4,7 @@ import { searchDataHub } from '../controllers/dataHub.controller';
 import { designMission } from '../controllers/missionDesigner.controller';
 import { generateReport, getReportStatus } from '../controllers/reports.controller';
 import { getUpcomingLaunches, predictDelay } from '../controllers/launches.controller';
+import { optimizeOrbit } from '../controllers/orbits.controller';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -24,5 +25,8 @@ router.get('/reports/:id/status', requireAuth, getReportStatus);
 // Launch Delay Predictor
 router.get('/launches/upcoming', requireAuth, getUpcomingLaunches);
 router.post('/launches/predict-delay', requireAuth, predictDelay);
+
+// Orbit Optimizer
+router.post('/orbits/optimize', requireAuth, optimizeOrbit);
 
 export default router;

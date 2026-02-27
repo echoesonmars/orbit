@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Crosshair, TrendingUp, FileText, Plus, Rocket } from "lucide-react";
+import { Crosshair, TrendingUp, FileText, Plus, Rocket, Globe2 } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { cn } from "@/lib/utils";
 import { useMapStore } from "@/lib/store/mapStore";
@@ -56,6 +56,15 @@ export function QuickActionsPanel() {
             href: "/dashboard/launch-delay",
             accent: "text-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)]",
             border: "hover:border-orange-500/40",
+            active: false,
+        },
+        {
+            label: "Orbit Optimizer",
+            description: "Transfer ΔV & fuel cost",
+            icon: Globe2,
+            href: "/dashboard/orbit-optimizer",
+            accent: "text-violet-400 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]",
+            border: "hover:border-violet-500/40",
             active: false,
         },
     ];
