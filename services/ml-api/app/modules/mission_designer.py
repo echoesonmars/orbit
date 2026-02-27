@@ -23,16 +23,17 @@ RULES:
 3. If they need broad agricultural monitoring (e.g., crop health, NDVI, forestry), assign a Multispectral sensor with medium resolution (e.g., 10m - 30m).
 4. If they need weather or continent monitoring, assign a Geostationary orbit with very low resolution (e.g., 1000m+).
 5. Provide a strong technical explanation justifying your choices.
-6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these five keys:
+6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these five keys. Example:
 {
-  "orbit_type": "string",
-  "resolution_meters": float,
-  "sensor_type": "string",
-  "explanation": "string",
-  "estimated_budget_usd": integer
+  "orbit_type": "Sun-synchronous (SSO)",
+  "resolution_meters": 0.5,
+  "sensor_type": "Optical RGB",
+  "explanation": "For counting vehicles in parking lots, a high-resolution optical sensor is needed...",
+  "estimated_budget_usd": 85000
 }
 Do not use markdown formatting like ```json```.
 7. YOU MUST respond in the exactly same language that the user used in their prompt (e.g. if the user writes in Russian, write the explanation and string values in Russian. If Kazakh, use Kazakh. If English, use English).
+8. If the user's prompt is vague, unclear, or just a greeting (e.g. "hello", "привет"), you MUST still generate a realistic demo mission specification. Pick a creative scenario yourself (e.g., monitoring forests in Siberia) and generate a proper JSON response. NEVER return placeholder values like "string" or 0.
 """
 
 def generate_mission_spec(messages_history: list) -> any:

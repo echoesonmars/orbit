@@ -6,17 +6,24 @@ import { useTranslations } from "next-intl";
 import { Crosshair, TrendingUp, FileText, Plus } from "lucide-react";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { cn } from "@/lib/utils";
+import { useMapStore } from "@/lib/store/mapStore";
 
 export function QuickActionsPanel() {
     const pathname = usePathname();
     const t = useTranslations("Dashboard.quickActions");
+    const { bbox } = useMapStore();
+
+    // Build the mission designer href with optional bbox params
+    const missionDesignerHref = bbox
+        ? `/dashboard/mission-designer?swLat=${bbox.southWest.lat.toFixed(5)}&swLng=${bbox.southWest.lng.toFixed(5)}&neLat=${bbox.northEast.lat.toFixed(5)}&neLng=${bbox.northEast.lng.toFixed(5)}`
+        : "/dashboard/mission-designer";
 
     const ACTIONS = [
         {
             label: t("newMission.title"),
             description: t("newMission.desc"),
             icon: Plus,
-            href: "/dashboard/mission-designer",
+            href: missionDesignerHref,
             accent: "text-cyan-400 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]",
             border: "hover:border-cyan-500/40",
             active: true,
@@ -47,7 +54,7 @@ export function QuickActionsPanel() {
                 {t("title")}
             </p>
             {ACTIONS.map((action) => {
-                const isActive = pathname.includes(action.href);
+                const isActive = pathname.includes("/mission-designer") && action.href.includes("/mission-designer") || pathname.includes(action.href);
                 return (
                     <Link
                         key={action.label}
@@ -75,3 +82,5 @@ export function QuickActionsPanel() {
         </div>
     );
 }
+
+
