@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
     ChevronLeft, DollarSign, Loader2, AlertCircle,
-    TrendingUp, MapPin, Cloud, Satellite, Zap, Globe
+    TrendingUp, MapPin, Cloud, Satellite, Zap, Globe, Flame, Sun, Radio
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,12 @@ type PredictionResult = {
     confidence: number;
     factors: Factor[];
     area_km2: number;
+    nasa: {
+        crisis_detected: boolean;
+        crisis_events: string[];
+        storm_level: string;
+        solar_flares: number;
+    };
 };
 
 // ─── Land Use Options ────────────────────────────────────────────────────────
@@ -339,9 +345,67 @@ function ValuePredictorInner() {
                                     </div>
                                 </div>
 
+                                {/* NASA Live Intelligence */}
+                                {result.nasa && (
+                                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 space-y-3">
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                            <Radio className="h-3 w-3 text-blue-400" />
+                                            NASA Live Intelligence
+                                        </p>
+
+                                        {/* Crisis events */}
+                                        <div className={cn(
+                                            "flex items-start gap-2 text-xs rounded-xl px-3 py-2",
+                                            result.nasa.crisis_detected
+                                                ? "bg-orange-500/10 border border-orange-500/20 text-orange-300"
+                                                : "bg-white/3 text-slate-500"
+                                        )}>
+                                            <Flame className={cn("h-3.5 w-3.5 mt-0.5 flex-shrink-0", result.nasa.crisis_detected ? "text-orange-400" : "text-slate-600")} />
+                                            <div>
+                                                <span className="font-medium">
+                                                    {result.nasa.crisis_detected ? "Active Events Detected" : "No Active Crisis Events"}
+                                                </span>
+                                                {result.nasa.crisis_events.length > 0 && (
+                                                    <p className="text-[10px] text-orange-400/70 mt-0.5">
+                                                        {result.nasa.crisis_events.slice(0, 3).join(" · ")}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Space weather */}
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className={cn(
+                                                "flex items-center gap-2 text-xs rounded-xl px-3 py-2 border",
+                                                result.nasa.storm_level !== "None"
+                                                    ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-300"
+                                                    : "bg-white/3 border-white/5 text-slate-500"
+                                            )}>
+                                                <Zap className={cn("h-3 w-3", result.nasa.storm_level !== "None" ? "text-yellow-400" : "text-slate-600")} />
+                                                <div>
+                                                    <p className="font-medium">Magnetic Storm</p>
+                                                    <p className="text-[10px]">{result.nasa.storm_level}</p>
+                                                </div>
+                                            </div>
+                                            <div className={cn(
+                                                "flex items-center gap-2 text-xs rounded-xl px-3 py-2 border",
+                                                result.nasa.solar_flares > 0
+                                                    ? "bg-red-500/10 border-red-500/20 text-red-300"
+                                                    : "bg-white/3 border-white/5 text-slate-500"
+                                            )}>
+                                                <Sun className={cn("h-3 w-3", result.nasa.solar_flares > 0 ? "text-red-400" : "text-slate-600")} />
+                                                <div>
+                                                    <p className="font-medium">Solar Flares</p>
+                                                    <p className="text-[10px]">{result.nasa.solar_flares} M/X class</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Note */}
                                 <p className="text-[10px] text-slate-600 text-center">
-                                    Estimated based on commercial market rates · Math Engine v1 · ML upgrade coming
+                                    Powered by NASA EONET &amp; DONKI · Math Engine v1
                                 </p>
                             </div>
                         )}

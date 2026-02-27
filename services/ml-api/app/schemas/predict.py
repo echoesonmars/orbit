@@ -14,9 +14,16 @@ class PredictValueFactor(BaseModel):
     impact: float
     type: str  # "positive" | "negative" | "crisis"
 
+class NasaData(BaseModel):
+    crisis_detected: bool
+    crisis_events: List[str]
+    storm_level: str
+    solar_flares: int
+
 class PredictValueResponse(BaseModel):
     value_usd: float
     confidence: float
     factors: List[PredictValueFactor]
     area_km2: float
     bbox: List[float]
+    nasa: NasaData

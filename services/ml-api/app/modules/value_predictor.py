@@ -1,52 +1,47 @@
 """
 Module 3: Capture Value Predictor
-Math-based pricing engine (Phase 1). ML model will replace _calculate_value() in Phase 2.
+Math-based pricing engine with real NASA data enrichment.
+Phase 2: Auto crisis detection (EONET) + space weather confidence (DONKI).
 """
 import math
 import datetime
 from typing import Optional
 
+from app.modules.nasa_adapter import check_crisis_zone, get_space_weather
 
 # ─── Pricing Constants ────────────────────────────────────────────────────────
 
-BASE_VALUE = 200.0              # Starting price per scene ($)
-BASE_CLOUD_PENALTY = 6.0        # $ lost per 1% cloud cover
-BASE_AREA_PRICE = 0.8           # $ per km² (capped at 500 km²)
-FRESHNESS_PREMIUM = 200.0       # $ bonus if captured < 7 days ago
-CRISIS_MULTIPLIER = 5.0         # Crisis zones cost 5x more
+BASE_VALUE = 200.0
+BASE_CLOUD_PENALTY = 6.0
+BASE_AREA_PRICE = 0.8
+FRESHNESS_PREMIUM = 200.0
+CRISIS_MULTIPLIER = 5.0
 
-# Land-use type → commercial value multiplier
 LAND_USE_MULTIPLIERS = {
-    "city":         2.5,   # Dense urban — high demand
-    "port":         3.0,   # Ports/logistics — premium intel
-    "agriculture":  1.8,   # Crop monitoring — broadscale demand
-    "military":     4.0,   # Restricted zones — very high premium
-    "forest":       1.2,   # Environmental monitoring
-    "desert":       0.4,   # Low commercial interest
-    "ocean":        0.15,  # Almost no commercial value
+    "city":         2.5,
+    "port":         3.0,
+    "agriculture":  1.8,
+    "military":     4.0,
+    "forest":       1.2,
+    "desert":       0.4,
+    "ocean":        0.15,
     "default":      1.0,
 }
 
-# Month → season multiplier (Northern hemisphere harvest seasons)
 SEASON_MULTIPLIERS = {
-    1:  1.0, 2:  1.0, 3:  1.1,   # Winter / early spring
-    4:  1.2, 5:  1.2, 6:  1.25,  # Spring growth
-    7:  1.3, 8:  1.3, 9:  1.35,  # Peak summer / early harvest
-    10: 1.3, 11: 1.1, 12: 1.0,   # Late harvest / winter
+    1:  1.0, 2:  1.0, 3:  1.1,
+    4:  1.2, 5:  1.2, 6:  1.25,
+    7:  1.3, 8:  1.3, 9:  1.35,
+    10: 1.3, 11: 1.1, 12: 1.0,
 }
 
-# Sensor resolution → multiplier
 def _resolution_multiplier(gsd_meters: float) -> float:
-    if gsd_meters < 0.5:  return 5.0    # Sub-50cm (Maxar class)
-    if gsd_meters < 1.0:  return 4.0    # High-res commercial
-    if gsd_meters < 5.0:  return 2.0    # Medium-res
-    return 1.0                           # 10m+ (Sentinel class)
-
-
-# ─── Area Helper ─────────────────────────────────────────────────────────────
+    if gsd_meters < 0.5: return 5.0
+    if gsd_meters < 1.0: return 4.0
+    if gsd_meters < 5.0: return 2.0
+    return 1.0
 
 def _bbox_area_km2(bbox: list[float]) -> float:
-    """Estimate bbox area in km²."""
     min_lon, min_lat, max_lon, max_lat = bbox
     lat_mid = math.radians((min_lat + max_lat) / 2)
     dx = abs(max_lon - min_lon) * math.cos(lat_mid) * 111.32
@@ -61,25 +56,35 @@ def predict_value(
     target: str = "default",
     cloud_cover: float = 20.0,
     gsd_meters: float = 10.0,
-    crisis: bool = False,
+    crisis: bool = False,            # manual override from user
     captured_date: Optional[str] = None,
 ) -> dict:
-    """
-    Predict commercial value of a satellite capture.
-    Returns price_usd, confidence, and detailed factor breakdown.
-    """
-    area_km2 = min(_bbox_area_km2(bbox), 500.0)   # cap at 500 km²
+    area_km2 = min(_bbox_area_km2(bbox), 500.0)
     month = datetime.datetime.now().month
 
-    # ── Calculate each factor ──────────────────────────────────────────────
-    land_multiplier     = LAND_USE_MULTIPLIERS.get(target.lower(), LAND_USE_MULTIPLIERS["default"])
-    resolution_mult     = _resolution_multiplier(gsd_meters)
-    season_mult         = SEASON_MULTIPLIERS[month]
-    crisis_mult         = CRISIS_MULTIPLIER if crisis else 1.0
-    cloud_penalty       = cloud_cover * BASE_CLOUD_PENALTY
-    area_bonus          = area_km2 * BASE_AREA_PRICE
+    # ── NASA Enrichment (real-time, parallel-ish) ──────────────────────────
+    # 1. EONET: auto-detect crisis zone by bbox intersection
+    eonet = check_crisis_zone(bbox)
+    nasa_crisis = eonet["is_crisis"]
+    crisis_events = eonet["events"]
 
-    # Freshness bonus
+    # 2. DONKI: space weather confidence penalty
+    space_wx = get_space_weather()
+    sw_penalty = space_wx["confidence_penalty"]
+    storm_level = space_wx["storm_level"]
+    solar_flares = space_wx["solar_flares"]
+
+    # Final crisis flag: either user set it OR NASA detected an event
+    is_crisis = crisis or nasa_crisis
+    crisis_mult = CRISIS_MULTIPLIER if is_crisis else 1.0
+
+    # ── Standard factors ───────────────────────────────────────────────────
+    land_multiplier = LAND_USE_MULTIPLIERS.get(target.lower(), LAND_USE_MULTIPLIERS["default"])
+    resolution_mult = _resolution_multiplier(gsd_meters)
+    season_mult     = SEASON_MULTIPLIERS[month]
+    cloud_penalty   = cloud_cover * BASE_CLOUD_PENALTY
+    area_bonus      = area_km2 * BASE_AREA_PRICE
+
     freshness_bonus = 0.0
     if captured_date:
         try:
@@ -90,7 +95,6 @@ def predict_value(
         except ValueError:
             pass
 
-    # ── Assemble final value ───────────────────────────────────────────────
     raw_value = (
         BASE_VALUE
         * land_multiplier
@@ -103,57 +107,47 @@ def predict_value(
     )
     value_usd = round(max(10.0, min(raw_value, 50_000.0)), 2)
 
-    # ── Confidence score ───────────────────────────────────────────────────
-    # Lower confidence when: high clouds, tiny area, no date info
-    confidence_penalties = 0.0
-    if cloud_cover > 50: confidence_penalties += 0.3
-    elif cloud_cover > 25: confidence_penalties += 0.1
-    if area_km2 < 10: confidence_penalties += 0.2
-    if not captured_date: confidence_penalties += 0.05
-    confidence = round(max(0.3, min(1.0 - confidence_penalties, 0.98)), 2)
+    # ── Confidence ─────────────────────────────────────────────────────────
+    conf_penalties = 0.0
+    if cloud_cover > 50: conf_penalties += 0.3
+    elif cloud_cover > 25: conf_penalties += 0.1
+    if area_km2 < 10: conf_penalties += 0.2
+    if not captured_date: conf_penalties += 0.05
+    conf_penalties += sw_penalty           # NASA DONKI penalty
+    confidence = round(max(0.3, min(1.0 - conf_penalties, 0.98)), 2)
 
-    # ── Factor breakdown (for the UI pie chart) ────────────────────────────
+    # ── Factor breakdown ───────────────────────────────────────────────────
     factors = [
-        {
-            "name": "Base Location Value",
-            "impact": round(BASE_VALUE * land_multiplier, 2),
-            "type": "positive"
-        },
-        {
-            "name": "Area Coverage",
-            "impact": round(area_bonus, 2),
-            "type": "positive"
-        },
-        {
-            "name": "Resolution Premium",
-            "impact": round(BASE_VALUE * land_multiplier * (resolution_mult - 1), 2),
-            "type": "positive"
-        },
-        {
-            "name": "Seasonal Demand",
-            "impact": round(BASE_VALUE * land_multiplier * season_mult - BASE_VALUE * land_multiplier, 2),
-            "type": "positive"
-        },
-        {
-            "name": "Freshness Premium",
-            "impact": round(freshness_bonus, 2),
-            "type": "positive"
-        },
-        {
-            "name": "Cloud Cover Penalty",
-            "impact": round(-cloud_penalty, 2),
-            "type": "negative"
-        },
+        {"name": "Base Location Value", "impact": round(BASE_VALUE * land_multiplier, 2), "type": "positive"},
+        {"name": "Area Coverage",       "impact": round(area_bonus, 2),                   "type": "positive"},
+        {"name": "Resolution Premium",  "impact": round(BASE_VALUE * land_multiplier * (resolution_mult - 1), 2), "type": "positive"},
+        {"name": "Seasonal Demand",     "impact": round(BASE_VALUE * land_multiplier * season_mult - BASE_VALUE * land_multiplier, 2), "type": "positive"},
+        {"name": "Freshness Premium",   "impact": round(freshness_bonus, 2),               "type": "positive"},
+        {"name": "Cloud Cover Penalty", "impact": round(-cloud_penalty, 2),                "type": "negative"},
     ]
 
-    if crisis:
+    if is_crisis:
+        crisis_label = f"Crisis Zone: {', '.join(crisis_events[:2])}" if crisis_events else "Crisis Zone Premium"
         factors.append({
-            "name": "Crisis Zone Premium",
+            "name": crisis_label,
             "impact": round(value_usd * (1 - 1 / CRISIS_MULTIPLIER), 2),
             "type": "crisis"
         })
 
-    # Filter out zero-impact factors
+    if storm_level != "None":
+        factors.append({
+            "name": f"Space Weather Risk ({storm_level} Storm)",
+            "impact": round(-value_usd * sw_penalty * 0.3, 2),
+            "type": "negative"
+        })
+
+    if solar_flares > 0:
+        factors.append({
+            "name": f"Solar Activity ({solar_flares} M/X flares)",
+            "impact": round(-value_usd * 0.02 * solar_flares, 2),
+            "type": "negative"
+        })
+
     factors = [f for f in factors if abs(f["impact"]) > 0.01]
 
     return {
@@ -162,4 +156,10 @@ def predict_value(
         "factors": factors,
         "area_km2": round(area_km2, 1),
         "bbox": bbox,
+        "nasa": {
+            "crisis_detected": nasa_crisis,
+            "crisis_events": crisis_events,
+            "storm_level": storm_level,
+            "solar_flares": solar_flares,
+        },
     }
