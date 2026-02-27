@@ -8,6 +8,7 @@ import { optimizeOrbit } from '../controllers/orbits.controller';
 import { getGoalProfiles, scoreOrbit } from '../controllers/scores.controller';
 import { analyzeForensics, csvUpload } from '../controllers/forensics.controller';
 import { runSimulation } from '../controllers/simulator.controller';
+import { assessEsg, getPropellants } from '../controllers/esg.controller';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -41,5 +42,9 @@ router.post('/forensics/analyze', requireAuth, csvUpload.single('file'), analyze
 
 // Scenario Simulator
 router.post('/simulator/run', requireAuth, runSimulation);
+
+// ESG Assessor
+router.get('/esg/propellants', requireAuth, getPropellants);
+router.post('/esg/assess', requireAuth, assessEsg);
 
 export default router;
