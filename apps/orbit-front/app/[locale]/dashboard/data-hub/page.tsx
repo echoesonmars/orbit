@@ -29,13 +29,17 @@ type SatelliteScene = {
     price: number;
 };
 
+import { createClient } from "@/lib/supabase/client";
+
 // Fetch real scenes from Gateway API
 const fetchScenesFromAPI = async (bbox: { southWest: { lat: number; lng: number }; northEast: { lat: number; lng: number } }): Promise<SatelliteScene[]> => {
     try {
         const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
 
-        // Use a dummy token or retrieve from actual auth state
-        const token = localStorage.getItem('supabase.auth.token') || 'dummy-token';
+        // Get real Supabase token
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token || '';
 
         const response = await fetch(`${gatewayUrl}/api/v1/data-hub/search`, {
             method: 'POST',
@@ -61,7 +65,6 @@ const fetchScenesFromAPI = async (bbox: { southWest: { lat: number; lng: number 
         return []; // Return empty array on failure
     }
 };
-
 export default function DataHubPage() {
     const t = useTranslations("Dashboard.dataHub");
     const { bbox } = useMapStore();
