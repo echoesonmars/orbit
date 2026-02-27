@@ -11,7 +11,7 @@ class MissionSpec(BaseModel):
 
 # Read from .env file or environment variable
 # If we deploy via Railway, we need to add OPENAI_API_KEY there too
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
 
 SYSTEM_PROMPT = """You are a Senior Aerospace Mission Design Engineer with 20 years of experience.
 Your job is to translate layman business or scientific requirements into precise technical satellite specifications.
@@ -29,8 +29,10 @@ def generate_mission_spec(user_prompt: str) -> dict:
     """
     Sends the user's business scenario to OpenAI to generate a technical mission specification.
     """
-    if not client.api_key:
-        raise ValueError("OPENAI_API_KEY is not set. Cannot run mission designer.")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is not set in Railway (or .env). Cannot run mission designer.")
+
+    client = OpenAI(api_key=api_key)
 
     try:
         response = client.chat.completions.create(
