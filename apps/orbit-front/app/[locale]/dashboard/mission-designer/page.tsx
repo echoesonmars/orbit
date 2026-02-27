@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
     Send, Bot, Loader2, Satellite, Target, Maximize,
     AlertCircle, ChevronLeft, MapPin, X, History,
-    Plus, Clock, DollarSign
+    Plus, Clock, DollarSign, Trash2, Pencil, Check
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -128,15 +128,31 @@ function SpecResultCards({ spec, t }: { spec: MissionSpec; t: any }) {
 }
 
 function SessionsSidebar({
-    sessions, activeId, onSelect, onNew, isOpen, onClose
+    sessions, activeId, onSelect, onNew, onDelete, onRename, isOpen, onClose
 }: {
     sessions: Session[];
     activeId: string | null;
     onSelect: (id: string) => void;
     onNew: () => void;
+    onDelete: (id: string) => void;
+    onRename: (id: string, title: string) => void;
     isOpen: boolean;
     onClose: () => void;
 }) {
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState("");
+
+    const startRename = (e: React.MouseEvent, s: Session) => {
+        e.stopPropagation();
+        setEditingId(s.id);
+        setEditTitle(s.title);
+    };
+
+    const confirmRename = (id: string) => {
+        if (editTitle.trim()) onRename(id, editTitle.trim());
+        setEditingId(null);
+    };
+
     return (
         <>
             {isOpen && <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={onClose} />}
@@ -159,22 +175,50 @@ function SessionsSidebar({
                     {sessions.length === 0 ? (
                         <p className="text-slate-600 text-xs text-center py-8">No sessions yet</p>
                     ) : sessions.map(s => (
-                        <button
+                        <div
                             key={s.id}
-                            onClick={() => onSelect(s.id)}
+                            onClick={() => { if (editingId !== s.id) onSelect(s.id); }}
                             className={cn(
-                                "w-full text-left px-3 py-2.5 rounded-xl transition-colors",
+                                "w-full text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer group",
                                 activeId === s.id
                                     ? "bg-purple-500/15 text-white border border-purple-500/20"
                                     : "hover:bg-white/5 text-slate-400 hover:text-slate-200"
                             )}
                         >
-                            <p className="text-xs font-medium truncate">{s.title}</p>
-                            <div className="flex items-center gap-1 mt-0.5 text-slate-600">
-                                <Clock className="h-2.5 w-2.5" />
-                                <span className="text-[10px]">{new Date(s.created_at).toLocaleDateString()}</span>
+                            {editingId === s.id ? (
+                                <div className="flex items-center gap-1">
+                                    <input
+                                        autoFocus
+                                        value={editTitle}
+                                        onChange={e => setEditTitle(e.target.value)}
+                                        onKeyDown={e => { if (e.key === "Enter") confirmRename(s.id); if (e.key === "Escape") setEditingId(null); }}
+                                        className="flex-1 bg-transparent text-xs text-white outline-none border-b border-purple-500/50 py-0.5"
+                                        onClick={e => e.stopPropagation()}
+                                    />
+                                    <button onClick={(e) => { e.stopPropagation(); confirmRename(s.id); }} className="p-0.5 text-green-400 hover:text-green-300">
+                                        <Check className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className="text-xs font-medium truncate">{s.title}</p>
+                            )}
+                            <div className="flex items-center justify-between mt-0.5">
+                                <div className="flex items-center gap-1 text-slate-600">
+                                    <Clock className="h-2.5 w-2.5" />
+                                    <span className="text-[10px]">{new Date(s.created_at).toLocaleDateString()}</span>
+                                </div>
+                                {editingId !== s.id && (
+                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={(e) => startRename(e, s)} className="p-1 rounded hover:bg-white/10 text-slate-500 hover:text-white" title="Rename">
+                                            <Pencil className="h-2.5 w-2.5" />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); onDelete(s.id); }} className="p-1 rounded hover:bg-red-500/20 text-slate-500 hover:text-red-400" title="Delete">
+                                            <Trash2 className="h-2.5 w-2.5" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                        </button>
+                        </div>
                     ))}
                 </div>
             </aside>
@@ -305,15 +349,27 @@ function MissionDesignerInner() {
                 setRawStream(prev => prev + chunk);
             }
 
-            const parsed = JSON.parse(accumulated);
-            setSpec(parsed);
-            setMessages(prev => [...prev, { role: "assistant", content: parsed.explanation }]);
+            // Try to parse as JSON (mission spec) — if it fails, it's a plain text chat reply
+            let assistantContent = accumulated;
+            let parsedSpec: MissionSpec | null = null;
+            try {
+                const parsed = JSON.parse(accumulated);
+                if (parsed.orbit_type && parsed.explanation) {
+                    parsedSpec = parsed;
+                    assistantContent = parsed.explanation;
+                    setSpec(parsed);
+                }
+            } catch {
+                // Not JSON — it's a normal text response, which is fine
+            }
+
+            setMessages(prev => [...prev, { role: "assistant", content: assistantContent }]);
             setRawStream("");
 
             // Save assistant response
             if (sessionId) {
                 await supabase.from("mission_chat_messages").insert({
-                    session_id: sessionId, role: "assistant", content: parsed.explanation, result_json: parsed
+                    session_id: sessionId, role: "assistant", content: assistantContent, result_json: parsedSpec
                 });
             }
         } catch (err: any) {
@@ -324,12 +380,25 @@ function MissionDesignerInner() {
         }
     };
 
+    const deleteSession = async (id: string) => {
+        await supabase.from("mission_chat_messages").delete().eq("session_id", id);
+        await supabase.from("mission_chat_sessions").delete().eq("id", id);
+        if (activeSessionId === id) startNewSession();
+        loadSessions();
+    };
+
+    const renameSession = async (id: string, title: string) => {
+        await supabase.from("mission_chat_sessions").update({ title }).eq("id", id);
+        loadSessions();
+    };
+
     return (
         <div className="absolute inset-0 z-30 bg-[#0A0E17]/95 backdrop-blur-3xl flex overflow-hidden">
             {/* Sidebar */}
             <SessionsSidebar
                 sessions={sessions} activeId={activeSessionId}
                 onSelect={loadSession} onNew={startNewSession}
+                onDelete={deleteSession} onRename={renameSession}
                 isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}
             />
 

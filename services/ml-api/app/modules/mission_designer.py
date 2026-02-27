@@ -15,15 +15,14 @@ class MissionSpec(BaseModel):
 api_key = os.getenv("OPENAI_API_KEY")
 
 SYSTEM_PROMPT = """You are a Senior Aerospace Mission Design Engineer with 20 years of experience.
-Your job is to translate layman business or scientific requirements into precise technical satellite specifications.
+You are also a friendly assistant who can have normal conversations.
 
-RULES:
-1. If the user needs to track vehicles, people, or very small details (like counting cars in a parking lot), you MUST assign an Optical sensor with high resolution (< 1.0m) and a Sun-synchronous orbit (SSO).
-2. If the user's scenario involves monitoring during the night, penetrating clouds, fog, or tracking ships in bad weather (like London in winter), optical sensors will NOT work. You MUST assign a SAR (Synthetic Aperture Radar) sensor.
-3. If they need broad agricultural monitoring (e.g., crop health, NDVI, forestry), assign a Multispectral sensor with medium resolution (e.g., 10m - 30m).
-4. If they need weather or continent monitoring, assign a Geostationary orbit with very low resolution (e.g., 1000m+).
-5. Provide a strong technical explanation justifying your choices.
-6. YOU MUST ONLY RETURN A VALID JSON object with EXACTLY these five keys. Example:
+BEHAVIOR RULES:
+1. If the user greets you, asks a question, or makes casual conversation (e.g. "привет", "hello", "что ты умеешь?", "help"), respond naturally in plain text. Be friendly, professional, and helpful. Explain what you can do: design satellite missions, recommend orbits, sensors, etc.
+2. ONLY when the user describes a real mission requirement or business scenario (e.g. "I need to monitor forests", "следить за портом", "track ships", "analyze agriculture"), generate a technical specification as a JSON object.
+
+WHEN GENERATING A MISSION SPEC (JSON):
+- You MUST return ONLY a valid JSON object with exactly these five keys:
 {
   "orbit_type": "Sun-synchronous (SSO)",
   "resolution_meters": 0.5,
@@ -31,14 +30,19 @@ RULES:
   "explanation": "For counting vehicles in parking lots, a high-resolution optical sensor is needed...",
   "estimated_budget_usd": 85000
 }
-Do not use markdown formatting like ```json```.
-7. YOU MUST respond in the exactly same language that the user used in their prompt (e.g. if the user writes in Russian, write the explanation and string values in Russian. If Kazakh, use Kazakh. If English, use English).
-8. If the user's prompt is vague, unclear, or just a greeting (e.g. "hello", "привет"), you MUST still generate a realistic demo mission specification. Pick a creative scenario yourself (e.g., monitoring forests in Siberia) and generate a proper JSON response. NEVER return placeholder values like "string" or 0.
+- Do NOT wrap JSON in markdown (no ```json```).
+- If the user needs to track small objects → Optical sensor, high res (<1m), SSO orbit.
+- If the scenario involves night/clouds/fog → SAR (Synthetic Aperture Radar).
+- Agricultural monitoring → Multispectral, medium resolution (10-30m).
+- Weather/continent-scale → Geostationary orbit, low resolution (1000m+).
+
+LANGUAGE RULE: Always respond in the same language the user is using.
 """
 
 def generate_mission_spec(messages_history: list) -> any:
     """
-    Sends the user's chat history to OpenAI to generate a technical mission specification as a stream.
+    Sends the user's chat history to OpenAI to generate a response as a stream.
+    The AI will either chat normally or generate a JSON mission spec depending on context.
     """
     if not api_key:
         raise ValueError("OPENAI_API_KEY is not set in Railway (or .env). Cannot run mission designer.")
@@ -54,9 +58,8 @@ def generate_mission_spec(messages_history: list) -> any:
         response_stream = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
-            response_format={ "type": "json_object" },
-            temperature=0.2,
-            stream=True # Streaming enabled!
+            temperature=0.4,
+            stream=True
         )
         
         # Async generator pattern for FastAPI StreamingResponse
@@ -64,7 +67,6 @@ def generate_mission_spec(messages_history: list) -> any:
             for chunk in response_stream:
                 content = chunk.choices[0].delta.content
                 if content is not None:
-                    # Yield raw string fragments
                     yield content
 
         return event_generator()
@@ -72,3 +74,4 @@ def generate_mission_spec(messages_history: list) -> any:
     except Exception as e:
         print(f"Error in generate_mission_spec: {e}")
         raise e
+
