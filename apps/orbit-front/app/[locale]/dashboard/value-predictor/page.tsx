@@ -23,6 +23,8 @@ type PredictionResult = {
     confidence: number;
     factors: Factor[];
     area_km2: number;
+    cloud_cover_used: number;
+    weather_source: string;
     nasa: {
         crisis_detected: boolean;
         crisis_events: string[];
@@ -86,6 +88,7 @@ function ValuePredictorInner() {
     // Inputs
     const [target, setTarget] = useState("city");
     const [cloudCover, setCloudCover] = useState(20);
+    const [isAutoCloud, setIsAutoCloud] = useState(true);
     const [gsd, setGsd] = useState(10);
     const [crisis, setCrisis] = useState(false);
 
@@ -121,7 +124,7 @@ function ValuePredictorInner() {
                 body: JSON.stringify({
                     bbox: bboxArr,
                     target,
-                    cloud_cover: cloudCover,
+                    cloud_cover: isAutoCloud ? -1 : cloudCover,
                     gsd_meters: gsd,
                     crisis,
                 }),
@@ -210,19 +213,43 @@ function ValuePredictorInner() {
                                 <label className="text-xs text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                     <Cloud className="h-3 w-3" /> Cloud Cover
                                 </label>
-                                <span className={cn(
-                                    "text-xs font-mono font-bold",
-                                    cloudCover < 20 ? "text-emerald-400" : cloudCover < 50 ? "text-yellow-400" : "text-red-400"
-                                )}>{cloudCover}%</span>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsAutoCloud(!isAutoCloud)}
+                                        className={cn(
+                                            "text-[10px] px-2 py-0.5 rounded-full border transition-all",
+                                            isAutoCloud
+                                                ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+                                                : "bg-white/5 border-white/10 text-slate-500 hover:text-slate-300"
+                                        )}
+                                    >
+                                        Auto
+                                    </button>
+                                    <span className={cn(
+                                        "text-xs font-mono font-bold",
+                                        isAutoCloud ? "text-emerald-400" : (cloudCover < 50 ? "text-yellow-400" : "text-red-400")
+                                    )}>
+                                        {isAutoCloud
+                                            ? (result ? `${result.cloud_cover_used}%` : isLoading ? "Fetching..." : "Auto")
+                                            : `${cloudCover}%`}
+                                    </span>
+                                </div>
                             </div>
-                            <input
-                                type="range" min={0} max={100} value={cloudCover}
-                                onChange={e => setCloudCover(Number(e.target.value))}
-                                className="w-full accent-purple-500 h-1.5"
-                            />
-                            <div className="flex justify-between text-[10px] text-slate-600">
-                                <span>Clear</span><span>Overcast</span>
-                            </div>
+                            {!isAutoCloud && (
+                                <>
+                                    <input
+                                        type="range" min={0} max={100} value={cloudCover}
+                                        onChange={e => setCloudCover(Number(e.target.value))}
+                                        className="w-full accent-purple-500 h-1.5"
+                                    />
+                                    <div className="flex justify-between text-[10px] text-slate-600">
+                                        <span>Clear</span><span>Overcast</span>
+                                    </div>
+                                </>
+                            )}
+                            {isAutoCloud && (
+                                <p className="text-[10px] text-slate-600 italic">Real-time data from Open-Meteo</p>
+                            )}
                         </div>
 
                         {/* Sensor / Resolution */}
@@ -399,6 +426,23 @@ function ValuePredictorInner() {
                                                     <p className="text-[10px]">{result.nasa.solar_flares} M/X class</p>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Weather Intelligence (Open-Meteo) */}
+                                {result.cloud_cover_used !== undefined && (
+                                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Cloud className="h-4 w-4 text-cyan-400" />
+                                            <div>
+                                                <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-none">Actual Cloud Cover</p>
+                                                <p className="text-xs font-semibold text-white mt-1">{result.cloud_cover_used}%</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-none">Source</p>
+                                            <p className="text-[10px] text-cyan-400 mt-1">{result.weather_source}</p>
                                         </div>
                                     </div>
                                 )}

@@ -8,7 +8,7 @@ const router = Router();
 
 // Endpoint for receiving predict requests from the Next.js frontend
 // Protected by requireAuth middleware
-router.post('/predict-value', requireAuth, getPrediction);
+router.post('/predict/value', requireAuth, getPrediction);
 
 // Data Hub search route
 router.post('/data-hub/search', requireAuth, searchDataHub);

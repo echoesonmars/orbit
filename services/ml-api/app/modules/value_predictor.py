@@ -8,6 +8,7 @@ import datetime
 from typing import Optional
 
 from app.modules.nasa_adapter import check_crisis_zone, get_space_weather
+from app.modules.weather_adapter import get_actual_cloud_cover
 
 # ─── Pricing Constants ────────────────────────────────────────────────────────
 
@@ -62,6 +63,18 @@ def predict_value(
     area_km2 = min(_bbox_area_km2(bbox), 500.0)
     month = datetime.datetime.now().month
 
+    # ── Weather Enrichment (Open-Meteo) ───────────────────────────────────
+    # If cloud_cover is < 0 or default 20.0 (and we have bbox), try auto-detect
+    final_cloud_cover = cloud_cover
+    weather_source = "Manual Input"
+    
+    # Only auto-detect when the frontend explicitly sends cloud_cover = -1
+    if cloud_cover < 0:
+        actual_clouds = get_actual_cloud_cover(bbox)
+        if actual_clouds is not None:
+            final_cloud_cover = actual_clouds
+            weather_source = "Open-Meteo Real-time"
+
     # ── NASA Enrichment (real-time, parallel-ish) ──────────────────────────
     # 1. EONET: auto-detect crisis zone by bbox intersection
     eonet = check_crisis_zone(bbox)
@@ -82,7 +95,7 @@ def predict_value(
     land_multiplier = LAND_USE_MULTIPLIERS.get(target.lower(), LAND_USE_MULTIPLIERS["default"])
     resolution_mult = _resolution_multiplier(gsd_meters)
     season_mult     = SEASON_MULTIPLIERS[month]
-    cloud_penalty   = cloud_cover * BASE_CLOUD_PENALTY
+    cloud_penalty   = final_cloud_cover * BASE_CLOUD_PENALTY
     area_bonus      = area_km2 * BASE_AREA_PRICE
 
     freshness_bonus = 0.0
@@ -109,8 +122,8 @@ def predict_value(
 
     # ── Confidence ─────────────────────────────────────────────────────────
     conf_penalties = 0.0
-    if cloud_cover > 50: conf_penalties += 0.3
-    elif cloud_cover > 25: conf_penalties += 0.1
+    if final_cloud_cover > 50: conf_penalties += 0.3
+    elif final_cloud_cover > 25: conf_penalties += 0.1
     if area_km2 < 10: conf_penalties += 0.2
     if not captured_date: conf_penalties += 0.05
     conf_penalties += sw_penalty           # NASA DONKI penalty
@@ -156,6 +169,8 @@ def predict_value(
         "factors": factors,
         "area_km2": round(area_km2, 1),
         "bbox": bbox,
+        "cloud_cover_used": round(final_cloud_cover, 1),
+        "weather_source": weather_source,
         "nasa": {
             "crisis_detected": nasa_crisis,
             "crisis_events": crisis_events,
