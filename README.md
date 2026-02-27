@@ -1,5 +1,8 @@
 # 🚀 OrbitAI: The Cognitive OS for the NewSpace Economy
 
+**Live Demo**: [https://orbit-ai-theta.vercel.app/en](https://orbit-ai-theta.vercel.app/en)  
+**Test Credentials**: `admin@gmail.com` / `12345678`
+
 OrbitAI is a high-performance, modular decision-intelligence platform designed to bridge the gap between orbital mechanics and business ROI. It provides a verticalized suite of 10 intelligence modules for mission planning, telemetry forensics, and orbital sustainability.
 
 ---
@@ -64,10 +67,17 @@ OrbitAI utilizes a **Distributed Microservices Architecture** designed for high-
 - Node.js `v20+` | Python `3.11+` | Docker
 
 ### 1. Environment Config
-Templates are provided in `.env.example`. Required configurations for:
-- `apps/orbit-front/.env.local`
-- `services/gateway/.env`
-- `services/ml-api/.env`
+Detailed templates are available in `.env.example` files across the repository.
+
+**Core Variables**:
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase Project URL.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase Anon/Public Key.
+- `SUPABASE_SERVICE_ROLE_KEY`: Service Role Key for backend administrative tasks (S3 uploads, DB writes).
+- `OPENAI_API_KEY`: Required for Mission Designer and Report Summaries.
+- `NASA_API_KEY`: Required for EONET and DONKI data (get it at [api.nasa.gov](https://api.nasa.gov)).
+- `MAPBOX_TOKEN`: Required for static map generation in PDF reports.
+- `ML_API_URL`: URL of the Python compute engine (default: `http://localhost:8000`).
+- `NEXT_PUBLIC_GATEWAY_URL`: URL of the Node.js API Gateway.
 
 ### 2. Service-Specific Initialization
 **Phase 1: ML-API**
