@@ -265,6 +265,16 @@
             },
             "viewDetails": "View Metadata",
             "buyScene": "Purchase Scene"
+        },
+        "missionDesigner": {
+            "title": "AI Mission Designer",
+            "subtitle": "Describe your business problem in plain English. Our AI will translate it into a precise technical aerospace specification.",
+            "placeholder": "E.g., I want to count cars in Walmart parking lots in sunny states...",
+            "calculating": "Calculating orbital mechanics...",
+            "cardOrbit": "Orbit Type",
+            "cardSensor": "Sensor payload",
+            "cardResolution": "Resolution (GSD)",
+            "reasoning": "Engineer's Reasoning"
         }
     }
 }
