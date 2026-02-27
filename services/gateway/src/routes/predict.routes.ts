@@ -5,6 +5,7 @@ import { designMission } from '../controllers/missionDesigner.controller';
 import { generateReport, getReportStatus } from '../controllers/reports.controller';
 import { getUpcomingLaunches, predictDelay } from '../controllers/launches.controller';
 import { optimizeOrbit } from '../controllers/orbits.controller';
+import { getGoalProfiles, scoreOrbit } from '../controllers/scores.controller';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -28,5 +29,9 @@ router.post('/launches/predict-delay', requireAuth, predictDelay);
 
 // Orbit Optimizer
 router.post('/orbits/optimize', requireAuth, optimizeOrbit);
+
+// Orbit Scorer
+router.get('/orbits/goals', requireAuth, getGoalProfiles);
+router.post('/orbits/score', requireAuth, scoreOrbit);
 
 export default router;
