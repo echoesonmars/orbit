@@ -27,7 +27,9 @@ type SatelliteScene = {
     ndvi: number;
     sensor: string;
     thumbnail: string;
+    fullres: string;
     price: number;
+    areaSqKm: number;
 };
 
 import { createClient } from "@/lib/supabase/client";
@@ -318,12 +320,13 @@ export default function DataHubPage() {
                     >
                         {/* Image Section (Left) */}
                         <div className="w-full md:w-2/3 bg-black flex items-center justify-center relative group min-h-[300px]">
-                            {selectedScene.thumbnail ? (
+                            {(selectedScene.fullres || selectedScene.thumbnail) ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
-                                    src={selectedScene.thumbnail}
+                                    src={selectedScene.fullres || selectedScene.thumbnail}
                                     alt={selectedScene.id}
                                     className="max-w-full max-h-[80vh] object-contain"
+                                    loading="eager"
                                 />
                             ) : (
                                 <Satellite className="h-24 w-24 text-slate-700" />
