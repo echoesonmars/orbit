@@ -6,12 +6,6 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
     Globe,
     Database,
     Crosshair,
@@ -57,16 +51,20 @@ export function Sidebar() {
     };
 
     return (
-        <TooltipProvider delayDuration={100}>
+        <>
             {/* Desktop Sidebar */}
             <aside
                 className={cn(
                     "hidden md:flex flex-col h-screen sticky top-0 z-20",
                     "bg-slate-900/60 backdrop-blur-md border-r border-white/10",
                     "transition-all duration-300 ease-in-out",
-                    collapsed ? "w-16" : "w-56"
+                    collapsed ? "w-0 min-w-0 overflow-hidden border-r-0" : "w-56"
                 )}
             >
+                <div className={cn(
+                    "flex flex-col h-full min-w-0",
+                    collapsed && "opacity-0 pointer-events-none"
+                )}>
                 {/* Logo */}
                 <div className={cn(
                     "flex items-center h-16 px-4 border-b border-white/10",
@@ -85,32 +83,24 @@ export function Sidebar() {
                     {NAV_ITEMS.map((item) => {
                         const active = isActive(item.href);
                         return (
-                            <Tooltip key={item.id}>
-                                <TooltipTrigger asChild>
-                                    <Link
-                                        href={item.href}
-                                        className={cn(
-                                            "flex items-center gap-3 rounded-md px-2 py-2 text-sm transition-all duration-200 group relative",
-                                            active
-                                                ? "bg-cyan-400/10 text-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.2)]"
-                                                : "text-slate-400 hover:text-white hover:bg-white/5"
-                                        )}
-                                    >
-                                        {active && (
-                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-cyan-400 rounded-r-full" />
-                                        )}
-                                        <item.icon className={cn("h-5 w-5 flex-shrink-0", active && "text-cyan-400")} />
-                                        {!collapsed && (
-                                            <span className="truncate">{item.label}</span>
-                                        )}
-                                    </Link>
-                                </TooltipTrigger>
-                                {collapsed && (
-                                    <TooltipContent side="right" className="bg-slate-800 border-white/10 text-white">
-                                        {item.label}
-                                    </TooltipContent>
+                            <Link
+                                key={item.id}
+                                href={item.href}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-md px-2 py-2 text-sm transition-all duration-200 group relative",
+                                    active
+                                        ? "bg-white/5 text-slate-200"
+                                        : "text-slate-400 hover:text-white hover:bg-white/5"
                                 )}
-                            </Tooltip>
+                            >
+                                {active && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-white/30 rounded-r-full" />
+                                )}
+                                <item.icon className="h-5 w-5 flex-shrink-0" />
+                                {!collapsed && (
+                                    <span className="truncate">{item.label}</span>
+                                )}
+                            </Link>
                         );
                     })}
                 </nav>
@@ -118,22 +108,14 @@ export function Sidebar() {
                 {/* Bottom Items */}
                 <div className="py-4 px-2 border-t border-white/10 space-y-1">
                     {BOTTOM_ITEMS.map((item) => (
-                        <Tooltip key={item.id}>
-                            <TooltipTrigger asChild>
-                                <Link
-                                    href={item.href}
-                                    className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
-                                >
-                                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                                    {!collapsed && <span>{item.label}</span>}
-                                </Link>
-                            </TooltipTrigger>
-                            {collapsed && (
-                                <TooltipContent side="right" className="bg-slate-800 border-white/10 text-white">
-                                    {item.label}
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
+                        <Link
+                            key={item.id}
+                            href={item.href}
+                            className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+                        >
+                            <item.icon className="h-5 w-5 flex-shrink-0" />
+                            {!collapsed && <span>{item.label}</span>}
+                        </Link>
                     ))}
 
                     {/* Collapse Toggle */}
@@ -151,7 +133,20 @@ export function Sidebar() {
                         )}
                     </button>
                 </div>
+                </div>
             </aside>
+
+            {/* Floating "Open sidebar" button when collapsed (desktop only) */}
+            {collapsed && (
+                <button
+                    type="button"
+                    onClick={() => setCollapsed(false)}
+                    className="hidden md:flex fixed left-0 top-1/2 -translate-y-1/2 z-30 w-10 h-14 items-center justify-center rounded-r-md bg-slate-900/80 backdrop-blur-md border border-l-0 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
+                    aria-label={t("expand")}
+                >
+                    <ChevronRight className="h-5 w-5" />
+                </button>
+            )}
 
             {/* Mobile Bottom Navigation (Scrollable) */}
             <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 h-16 bg-slate-900/80 backdrop-blur-md border-t border-white/10 flex items-center overflow-x-auto overflow-y-hidden px-2 no-scrollbar snap-x">
@@ -164,7 +159,7 @@ export function Sidebar() {
                                 href={item.href}
                                 className={cn(
                                     "flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-all snap-center w-16",
-                                    active ? "text-cyan-400" : "text-slate-500"
+                                    active ? "text-white" : "text-slate-500"
                                 )}
                             >
                                 <item.icon className="h-5 w-5" />
@@ -176,6 +171,6 @@ export function Sidebar() {
                     })}
                 </div>
             </nav>
-        </TooltipProvider>
+        </>
     );
 }

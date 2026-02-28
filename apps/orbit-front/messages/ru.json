@@ -215,7 +215,8 @@
             "scenarioSimulator": "Симулятор ROI (Monte-Carlo)",
             "esg": "ESG и Экология",
             "settings": "Настройки",
-            "collapse": "Свернуть"
+            "collapse": "Свернуть",
+            "expand": "Открыть панель"
         },
         "stats": {
             "missions": "Миссии",

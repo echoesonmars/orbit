@@ -11,7 +11,7 @@ export default function DashboardLayout({
             <Sidebar />
 
             {/* Main content area - relative so overlays can be absolute within it */}
-            <main className="flex-1 relative overflow-hidden pb-16 md:pb-0">
+            <main className="flex-1 min-w-0 relative overflow-hidden pb-16 md:pb-0">
                 {children}
             </main>
         </div>

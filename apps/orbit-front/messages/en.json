@@ -215,7 +215,8 @@
             "scenarioSimulator": "Scenario Simulator",
             "esg": "ESG Assessor",
             "settings": "Settings",
-            "collapse": "Collapse"
+            "collapse": "Collapse",
+            "expand": "Open sidebar"
         },
         "stats": {
             "missions": "Missions",
