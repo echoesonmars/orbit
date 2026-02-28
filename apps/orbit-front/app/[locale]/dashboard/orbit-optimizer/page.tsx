@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import {
     ChevronLeft, Orbit, Loader2, Fuel, DollarSign, Clock,
-    Zap, ChevronDown, Globe2, ZoomIn, ZoomOut
+    Zap, ChevronDown, Globe2, ZoomIn, ZoomOut, History
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { saveRun, loadRuns, type ModuleRunRow } from "@/lib/dashboard/useModuleHistory";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -252,7 +253,12 @@ export default function OrbitOptimizerPage() {
     const [error, setError] = useState<string | null>(null);
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [orbitZoom, setOrbitZoom] = useState(1);
+    const [historyRuns, setHistoryRuns] = useState<ModuleRunRow[]>([]);
     const supabase = createClient();
+
+    useEffect(() => {
+        loadRuns("orbit-optimizer").then(({ data }) => setHistoryRuns(data));
+    }, []);
 
     const handleOptimize = useCallback(async () => {
         setIsLoading(true);
@@ -278,6 +284,9 @@ export default function OrbitOptimizerPage() {
 
             const data: OptimizeResult = await resp.json();
             setResult(data);
+            const title = `Transfer ${data.initial_altitude_km}→${data.target_altitude_km} km`;
+            await saveRun("orbit-optimizer", title, data);
+            loadRuns("orbit-optimizer").then(({ data: runs }) => setHistoryRuns(runs));
         } catch (e: any) {
             setError(e.message);
         } finally {
@@ -372,6 +381,31 @@ export default function OrbitOptimizerPage() {
 
                     {error && (
                         <p className="text-xs text-red-400 text-center">{error}</p>
+                    )}
+
+                    {/* History */}
+                    {historyRuns.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-xs text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <History className="h-3.5 w-3.5" /> History
+                            </p>
+                            <ul className="space-y-1 max-h-40 overflow-y-auto rounded-xl border border-white/5 bg-white/3 divide-y divide-white/5">
+                                {historyRuns.map((run) => (
+                                    <li key={run.id}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setResult(run.payload as OptimizeResult)}
+                                            className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex justify-between items-center gap-2"
+                                        >
+                                            <span className="truncate">{run.title}</span>
+                                            <span className="text-[10px] text-slate-600 flex-shrink-0">
+                                                {new Date(run.created_at).toLocaleDateString()}
+                                            </span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     )}
                 </div>
 

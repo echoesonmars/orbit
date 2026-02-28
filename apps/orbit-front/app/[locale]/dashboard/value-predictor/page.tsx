@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,6 +8,7 @@ import {
     TrendingUp, MapPin, Cloud, Satellite, Zap, Globe, Flame, Sun, Radio, FileText
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { saveRun, loadRuns, type ModuleRunRow } from "@/lib/dashboard/useModuleHistory";
 import { cn } from "@/lib/utils";
 import { ReportModal } from "./ReportModal";
 
@@ -108,6 +109,11 @@ function ValuePredictorInner() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [historyRuns, setHistoryRuns] = useState<ModuleRunRow[]>([]);
+
+    useEffect(() => {
+        loadRuns("value-predictor").then(({ data }) => setHistoryRuns(data));
+    }, []);
 
     const handlePredict = async () => {
         if (!bboxArr) return;
@@ -160,6 +166,9 @@ function ValuePredictorInner() {
                             value_score: valueScore,
                             factors: data.factors ?? [],
                         });
+                        const title = `Value $${(data.value_usd ?? 0).toLocaleString()} · ${(data.confidence ?? 0) * 100}%`;
+                        await saveRun("value-predictor", title, { ...data, bbox: bboxArr });
+                        loadRuns("value-predictor").then(({ data: runs }) => setHistoryRuns(runs));
                     }
                 } catch (_) {
                     // Non-blocking: result already shown; stats may not update until next run
@@ -343,6 +352,37 @@ function ValuePredictorInner() {
                             {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <DollarSign className="h-5 w-5" />}
                             {isLoading ? "Calculating…" : "Predict Value"}
                         </button>
+
+                        {/* Recent predictions */}
+                        {historyRuns.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="text-sm text-slate-400 uppercase tracking-wider">Recent predictions</p>
+                                <ul className="space-y-1 max-h-48 overflow-y-auto rounded-xl border border-white/5 bg-white/3 divide-y divide-white/5">
+                                    {historyRuns.map((run) => {
+                                        const p = run.payload as Record<string, unknown> & { value_usd?: number; confidence?: number };
+                                        const label = run.title || (p?.value_usd != null ? `$${Number(p.value_usd).toLocaleString()}` : run.created_at);
+                                        return (
+                                            <li key={run.id}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const { bbox: _b, ...rest } = p;
+                                                        setResult(rest as PredictionResult);
+                                                        setError(null);
+                                                    }}
+                                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex justify-between items-center gap-2"
+                                                >
+                                                    <span className="truncate">{label}</span>
+                                                    <span className="text-xs text-slate-500 flex-shrink-0">
+                                                        {new Date(run.created_at).toLocaleDateString()}
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
                     </div>
 
                     {/* ─── Right Panel: Results ─── */}

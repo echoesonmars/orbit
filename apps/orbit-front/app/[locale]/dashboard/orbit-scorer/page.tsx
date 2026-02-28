@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
     ChevronLeft, Target, Loader2, Plus, Trash2, ChevronDown,
-    Trophy, Star, AlertTriangle, MapPin
+    Trophy, Star, AlertTriangle, MapPin, History
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { saveRun, loadRuns, type ModuleRunRow } from "@/lib/dashboard/useModuleHistory";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -239,7 +240,12 @@ export default function OrbitScorerPage() {
     const [result, setResult] = useState<ScoreResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [historyRuns, setHistoryRuns] = useState<ModuleRunRow[]>([]);
     const supabase = createClient();
+
+    useEffect(() => {
+        loadRuns("orbit-scorer").then(({ data }) => setHistoryRuns(data));
+    }, []);
 
     // Fetch goal profiles on mount
     useEffect(() => {
@@ -285,6 +291,8 @@ export default function OrbitScorerPage() {
             if (!resp.ok) throw new Error(`Server error ${resp.status}`);
             const data: ScoreResponse = await resp.json();
             setResult(data);
+            await saveRun("orbit-scorer", `Score: ${data.business_goal_label ?? selectedGoal}`, data);
+            loadRuns("orbit-scorer").then(({ data: runs }) => setHistoryRuns(runs));
         } catch (e: any) {
             setError(e.message);
         } finally {
@@ -397,6 +405,31 @@ export default function OrbitScorerPage() {
                     </button>
 
                     {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+
+                    {/* History */}
+                    {historyRuns.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-xs text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <History className="h-3.5 w-3.5" /> History
+                            </p>
+                            <ul className="space-y-1 max-h-40 overflow-y-auto rounded-xl border border-white/5 bg-white/3 divide-y divide-white/5">
+                                {historyRuns.map((run) => (
+                                    <li key={run.id}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setResult(run.payload as ScoreResponse)}
+                                            className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex justify-between items-center gap-2"
+                                        >
+                                            <span className="truncate">{run.title}</span>
+                                            <span className="text-[10px] text-slate-600 flex-shrink-0">
+                                                {new Date(run.created_at).toLocaleDateString()}
+                                            </span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Results */}

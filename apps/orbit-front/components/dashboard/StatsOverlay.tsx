@@ -123,6 +123,9 @@ export function StatsOverlay() {
             }
         }
         fetchStats();
+        const onFocus = () => fetchStats();
+        window.addEventListener("focus", onFocus);
+        return () => window.removeEventListener("focus", onFocus);
     }, []);
 
     const STATS_CONFIG: StatConfig[] = [
