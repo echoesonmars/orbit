@@ -30,8 +30,17 @@ export const getUpcomingLaunches = async (_req: Request, res: Response): Promise
 
         res.status(200).json(mlResponse.data);
     } catch (error: any) {
-        console.error('[Gateway] Error in getUpcomingLaunches:', error?.response?.data || error.message);
-        res.status(500).json({ error: 'Failed to fetch upcoming launches' });
+        const mlData = error?.response?.data;
+        const mlStatus = error?.response?.status;
+        console.error('[Gateway] Error in getUpcomingLaunches:', {
+            message: error?.message,
+            mlStatus,
+            mlData: mlData != null ? JSON.stringify(mlData).slice(0, 500) : undefined,
+        });
+        res.status(500).json({
+            error: 'Failed to fetch upcoming launches',
+            detail: mlStatus != null ? `Upstream ${mlStatus}` : error?.message,
+        });
     }
 };
 

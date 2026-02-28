@@ -29,16 +29,19 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-# ─── Color Palette ────────────────────────────────────────────────────────────
-DARK_BG    = colors.HexColor("#0A0E17")
+# ─── Color Palette (light theme for print-friendly PDF) ────────────────────────
+PAGE_BG    = colors.HexColor("#FFFFFF")
+CARD_BG    = colors.HexColor("#F8FAFC")
+TABLE_BG   = colors.HexColor("#F1F5F9")
 ACCENT     = colors.HexColor("#7C3AED")     # Purple
 ACCENT2    = colors.HexColor("#06B6D4")     # Cyan
 POSITIVE   = colors.HexColor("#10B981")     # Green
 NEGATIVE   = colors.HexColor("#EF4444")     # Red
 CRISIS     = colors.HexColor("#F97316")     # Orange
 MUTED      = colors.HexColor("#64748B")
-WHITE      = colors.HexColor("#F8FAFC")
-LIGHT_GRAY = colors.HexColor("#1E293B")
+TEXT_DARK  = colors.HexColor("#1E293B")
+TEXT_LIGHT = colors.HexColor("#64748B")
+BORDER     = colors.HexColor("#E2E8F0")
 
 
 # ─── Executive Summary via OpenAI ────────────────────────────────────────────
@@ -97,11 +100,13 @@ Write the summary now (3 sentences, professional English):"""
 
 # ─── Matplotlib Charts ────────────────────────────────────────────────────────
 
-def _make_waterfall_chart(factors: list) -> io.BytesIO:
-    """Generates a horizontal waterfall/bar chart of price factors."""
-    fig, ax = plt.subplots(figsize=(7, max(3, len(factors) * 0.55)))
-    fig.patch.set_facecolor("#0D1117")
-    ax.set_facecolor("#0D1117")
+def _make_waterfall_chart(factors: list) -> tuple[io.BytesIO, float]:
+    """Generates a horizontal waterfall/bar chart of price factors. Returns (buf, aspect_ratio)."""
+    fig_h = max(3, len(factors) * 0.55)
+    fig_w = 7
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+    fig.patch.set_facecolor("#FFFFFF")
+    ax.set_facecolor("#FFFFFF")
 
     names  = [f["name"] for f in factors]
     values = [f["impact"] for f in factors]
@@ -117,36 +122,36 @@ def _make_waterfall_chart(factors: list) -> io.BytesIO:
         label = f"${val:+,.0f}"
         x_pos = bar.get_width() + (max(abs(v) for v in values) * 0.02)
         ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
-                label, va="center", ha="left", color="#94A3B8", fontsize=8.5)
+                label, va="center", ha="left", color="#475569", fontsize=8.5)
 
-    ax.axvline(0, color="#334155", linewidth=1)
-    ax.set_xlabel("Impact (USD)", color="#64748B", fontsize=9)
-    ax.tick_params(colors="#94A3B8", labelsize=8.5)
-    ax.spines[:].set_color("#1E293B")
-    ax.xaxis.label.set_color("#64748B")
+    ax.axvline(0, color="#94A3B8", linewidth=1)
+    ax.set_xlabel("Impact (USD)", color="#475569", fontsize=9)
+    ax.tick_params(colors="#475569", labelsize=8.5)
+    ax.spines[:].set_color("#E2E8F0")
+    ax.xaxis.label.set_color("#475569")
     for spine in ax.spines.values():
-        spine.set_edgecolor("#1E293B")
+        spine.set_edgecolor("#E2E8F0")
 
     plt.tight_layout(pad=0.5)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=140, bbox_inches="tight", facecolor=fig.get_facecolor())
     buf.seek(0)
     plt.close(fig)
-    return buf
+    return buf, fig_h / fig_w
 
 
 def _make_confidence_gauge(confidence: float) -> io.BytesIO:
-    """Generates a semi-circle confidence gauge."""
+    """Generates a semi-circle confidence gauge (light theme)."""
     fig, ax = plt.subplots(figsize=(4, 2.2), subplot_kw={"aspect": "equal"})
-    fig.patch.set_facecolor("#0D1117")
-    ax.set_facecolor("#0D1117")
+    fig.patch.set_facecolor("#FFFFFF")
+    ax.set_facecolor("#FFFFFF")
     ax.set_xlim(-1.3, 1.3)
     ax.set_ylim(-0.3, 1.3)
     ax.axis("off")
 
     # Background arc
     theta = np.linspace(0, np.pi, 100)
-    ax.plot(np.cos(theta), np.sin(theta), color="#1E293B", linewidth=18, solid_capstyle="round")
+    ax.plot(np.cos(theta), np.sin(theta), color="#E2E8F0", linewidth=18, solid_capstyle="round")
 
     # Confidence arc
     fill_theta = np.linspace(0, np.pi * confidence, 100)
@@ -177,7 +182,7 @@ def _fetch_map_image(bbox: list) -> io.BytesIO | None:
         lat_center = (min_lat + max_lat) / 2
         # Use auto-fit bbox
         url = (
-            f"https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/"
+            f"https://api.mapbox.com/styles/v1/mapbox/light-v11/static/"
             f"[{min_lon},{min_lat},{max_lon},{max_lat}]/"
             f"640x360@2x?access_token={token}"
         )
@@ -213,13 +218,13 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
     cover_bg = Table(
         [[Paragraph(
             f'<font color="#7C3AED" size="28"><b>OrbitAI</b></font><br/>'
-            f'<font color="#F8FAFC" size="16">Satellite Intelligence Report</font>',
+            f'<font color="#1E293B" size="16">Satellite Intelligence Report</font>',
             style("Cover", alignment=TA_CENTER, leading=40)
         )]],
         colWidths=[W]
     )
     cover_bg.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), DARK_BG),
+        ("BACKGROUND", (0, 0), (-1, -1), CARD_BG),
         ("ROUNDEDCORNERS", [8]),
         ("TOPPADDING", (0, 0), (-1, -1), 30),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 30),
@@ -238,10 +243,10 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
     meta_data_table.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
         ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("TEXTCOLOR", (0, 0), (0, -1), colors.HexColor("#64748B")),
-        ("TEXTCOLOR", (1, 0), (1, -1), colors.HexColor("#F8FAFC")),
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#0D1117")),
-        ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#1E293B")),
+        ("TEXTCOLOR", (0, 0), (0, -1), TEXT_LIGHT),
+        ("TEXTCOLOR", (1, 0), (1, -1), TEXT_DARK),
+        ("BACKGROUND", (0, 0), (-1, -1), TABLE_BG),
+        ("GRID", (0, 0), (-1, -1), 0.25, BORDER),
         ("ROWPADDING", (0, 0), (-1, -1), 6),
     ]))
     story.append(meta_data_table)
@@ -256,8 +261,8 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
 
     summary_text = _generate_executive_summary(data)
     story.append(Paragraph(summary_text, style("Exec",
-        fontSize=10, leading=16, textColor=WHITE,
-        alignment=TA_JUSTIFY, backColor=LIGHT_GRAY,
+        fontSize=10, leading=16, textColor=TEXT_DARK,
+        alignment=TA_JUSTIFY, backColor=CARD_BG,
         borderPad=10, leftIndent=8, rightIndent=8,
     )))
     story.append(Spacer(1, 16))
@@ -286,13 +291,13 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
     metrics_table = Table(metrics, colWidths=[70*mm, 65*mm, W - 135*mm])
     metrics_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
-        ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#0D1117")),
-        ("TEXTCOLOR", (0, 1), (-1, -1), WHITE),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#0D1117"), colors.HexColor("#111827")]),
-        ("GRID", (0, 0), (-1, -1), 0.25, LIGHT_GRAY),
+        ("BACKGROUND", (0, 1), (-1, -1), PAGE_BG),
+        ("TEXTCOLOR", (0, 1), (-1, -1), TEXT_DARK),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, TABLE_BG]),
+        ("GRID", (0, 0), (-1, -1), 0.25, BORDER),
         ("ROWPADDING", (0, 0), (-1, -1), 7),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
     ]))
@@ -309,19 +314,20 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
     # Waterfall chart
     factors = data.get("factors", [])
     if factors:
-        chart_buf = _make_waterfall_chart(factors)
-        chart_img = RLImage(chart_buf, width=W, height=min(W * 0.55, 160))
+        chart_buf, chart_aspect = _make_waterfall_chart(factors)
+        chart_img = RLImage(chart_buf, width=W, height=W * chart_aspect)
         story.append(chart_img)
         story.append(Spacer(1, 16))
 
-    # Confidence gauge
+    # Confidence gauge (figsize 4x2.2 => aspect 0.55)
     story.append(Paragraph("Confidence Assessment", style("H2",
         fontSize=13, textColor=ACCENT2, spaceBefore=4, spaceAfter=6,
         fontName="Helvetica-Bold"
     )))
     story.append(HRFlowable(width=W, thickness=0.5, color=ACCENT2, spaceAfter=10))
     gauge_buf = _make_confidence_gauge(data.get("confidence", 0.5))
-    gauge_img = RLImage(gauge_buf, width=110*mm, height=60*mm)
+    gauge_w, gauge_h = 110 * mm, 60.5 * mm  # 2.2/4 aspect
+    gauge_img = RLImage(gauge_buf, width=gauge_w, height=gauge_h)
     # Center it
     gauge_table = Table([[gauge_img]], colWidths=[W])
     gauge_table.setStyle(TableStyle([("ALIGN", (0, 0), (-1, -1), "CENTER")]))
@@ -347,13 +353,14 @@ def generate_pdf(report_id: str, data: dict) -> bytes:
 
     nasa_table = Table(nasa_rows, colWidths=[50*mm, 70*mm, W - 120*mm])
     nasa_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1E293B")),
+        ("BACKGROUND", (0, 0), (-1, 0), TABLE_BG),
         ("TEXTCOLOR", (0, 0), (-1, 0), ACCENT2),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#0D1117")),
-        ("TEXTCOLOR", (0, 1), (-1, -1), WHITE),
-        ("GRID", (0, 0), (-1, -1), 0.25, LIGHT_GRAY),
+        ("BACKGROUND", (0, 1), (-1, -1), PAGE_BG),
+        ("TEXTCOLOR", (0, 1), (-1, -1), TEXT_DARK),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, TABLE_BG]),
+        ("GRID", (0, 0), (-1, -1), 0.25, BORDER),
         ("ROWPADDING", (0, 0), (-1, -1), 7),
     ]))
     story.append(nasa_table)
@@ -400,7 +407,7 @@ no warranty, express or implied, regarding the accuracy or completeness of this 
 All data is subject to availability of external APIs at the time of generation.
     """.strip()
     story.append(Paragraph(disclaimer, style("Disclaimer",
-        fontSize=9, leading=14, textColor=colors.HexColor("#94A3B8"),
+        fontSize=9, leading=14, textColor=TEXT_LIGHT,
         alignment=TA_JUSTIFY,
     )))
 

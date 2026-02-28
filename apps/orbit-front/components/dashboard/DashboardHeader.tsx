@@ -15,8 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { LogOut, Settings, User as UserIcon, Dot, Search, Loader2, MapPin } from "lucide-react";
+import { LogOut, Settings, User as UserIcon, Search, Loader2, MapPin } from "lucide-react";
 
 type SearchResult = {
     lat: string;
@@ -138,13 +137,6 @@ export function DashboardHeader() {
 
             {/* Right: User Menu */}
             <div className="flex items-center gap-3 pointer-events-auto">
-                <Badge
-                    variant="outline"
-                    className="hidden sm:flex border-purple-500/30 text-purple-400 bg-purple-500/10 font-mono text-xs"
-                >
-                    {t("beta")}
-                </Badge>
-
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 rounded-full p-1 hover:bg-white/5 transition-colors outline-none">

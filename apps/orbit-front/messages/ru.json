@@ -217,6 +217,13 @@
             "settings": "Настройки",
             "collapse": "Свернуть"
         },
+        "stats": {
+            "missions": "Миссии",
+            "missionsToday": "Миссий сегодня",
+            "predictions": "Прогнозы",
+            "avgScore": "Средний балл",
+            "loading": "Загрузка..."
+        },
         "quickActions": {
             "title": "Быстрый старт",
             "newMission": {

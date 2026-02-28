@@ -64,8 +64,8 @@ function FactorBar({ factor, maxAbsImpact }: { factor: Factor; maxAbsImpact: num
 
     return (
         <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-                <span className="text-slate-400 truncate max-w-[160px]">{factor.name}</span>
+            <div className="flex justify-between text-sm">
+                <span className="text-slate-400 truncate max-w-[180px]">{factor.name}</span>
                 <span className={cn("font-mono font-semibold", isNeg ? "text-red-400" : "text-emerald-400")}>
                     {isNeg ? "−" : "+"}${Math.abs(factor.impact).toFixed(0)}
                 </span>
@@ -155,15 +155,15 @@ function ValuePredictorInner() {
             {/* Main area */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex items-center gap-3 px-5 py-3 border-b border-white/5 flex-shrink-0">
-                    <Link href="/dashboard" className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                <header className="flex items-center gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                    <Link href="/dashboard" className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
                         <ChevronLeft className="h-5 w-5" />
                     </Link>
                     <div className="flex items-center gap-2">
                         <DollarSign className="h-5 w-5 text-purple-400" />
-                        <h1 className="text-white font-semibold text-sm">Value Predictor</h1>
+                        <h1 className="text-white font-semibold text-base">Value Predictor</h1>
                     </div>
-                    <span className="text-[10px] text-slate-600 bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider ml-auto">
+                    <span className="text-xs text-slate-600 bg-white/3 px-2.5 py-1 rounded-lg uppercase tracking-wider ml-auto border border-white/5">
                         Math Engine v1
                     </span>
                 </header>
@@ -173,13 +173,13 @@ function ValuePredictorInner() {
                     <div className="w-full lg:w-80 flex-shrink-0 space-y-4">
                         {/* BBox status */}
                         <div className={cn(
-                            "flex items-center gap-3 px-4 py-3 rounded-2xl border",
+                            "flex items-center gap-3 px-4 py-3 rounded-xl border",
                             hasBbox
                                 ? "bg-purple-500/10 border-purple-500/20 text-purple-300"
-                                : "bg-white/5 border-white/10 text-slate-500"
+                                : "bg-white/3 border-white/5 text-slate-500"
                         )}>
                             <MapPin className="h-4 w-4 flex-shrink-0" />
-                            <span className="text-xs">
+                            <span className="text-sm">
                                 {hasBbox
                                     ? `Region: ${Number(swLat).toFixed(3)}°, ${Number(swLng).toFixed(3)}° → ${Number(neLat).toFixed(3)}°, ${Number(neLng).toFixed(3)}°`
                                     : "No region selected — go to Dashboard and draw a bbox on the map"
@@ -189,20 +189,20 @@ function ValuePredictorInner() {
 
                         {/* Target (Land Use) */}
                         <div className="space-y-2">
-                            <label className="text-xs text-slate-400 uppercase tracking-wider">Land Use Type</label>
-                            <div className="grid grid-cols-2 gap-1.5">
+                            <label className="text-sm text-slate-400 uppercase tracking-wider">Land Use Type</label>
+                            <div className="grid grid-cols-2 gap-2">
                                 {TARGETS.map(t => (
                                     <button
                                         key={t.value}
                                         onClick={() => setTarget(t.value)}
                                         className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all border",
+                                            "flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-colors border",
                                             target === t.value
-                                                ? "bg-purple-500/20 border-purple-500/40 text-white"
-                                                : "bg-white/3 border-white/8 text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                                                ? "bg-purple-500/20 border-purple-500/30 text-white"
+                                                : "bg-white/3 border-white/5 text-slate-500 hover:bg-white/5 hover:text-slate-300"
                                         )}
                                     >
-                                        <t.icon className={cn("h-3 w-3 flex-shrink-0", t.color)} />
+                                        <t.icon className={cn("h-4 w-4 flex-shrink-0", t.color)} />
                                         <span className="truncate">{t.label}</span>
                                     </button>
                                 ))}
@@ -212,27 +212,27 @@ function ValuePredictorInner() {
                         {/* Cloud Cover */}
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <label className="text-xs text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Cloud className="h-3 w-3" /> Cloud Cover
+                                <label className="text-sm text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Cloud className="h-4 w-4" /> Cloud Cover
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setIsAutoCloud(!isAutoCloud)}
                                         className={cn(
-                                            "text-[10px] px-2 py-0.5 rounded-full border transition-all",
+                                            "text-xs px-2.5 py-1 rounded-lg border transition-colors",
                                             isAutoCloud
-                                                ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
-                                                : "bg-white/5 border-white/10 text-slate-500 hover:text-slate-300"
+                                                ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-300"
+                                                : "bg-white/3 border-white/5 text-slate-500 hover:text-slate-300"
                                         )}
                                     >
-                                        Auto
+                                        {isAutoCloud ? "Real-time" : "Manual"}
                                     </button>
                                     <span className={cn(
-                                        "text-xs font-mono font-bold",
+                                        "text-sm font-mono font-bold",
                                         isAutoCloud ? "text-emerald-400" : (cloudCover < 50 ? "text-yellow-400" : "text-red-400")
                                     )}>
                                         {isAutoCloud
-                                            ? (result ? `${result.cloud_cover_used}%` : isLoading ? "Fetching..." : "Auto")
+                                            ? (result ? `${result.cloud_cover_used}%` : isLoading ? "Fetching…" : "—")
                                             : `${cloudCover}%`}
                                     </span>
                                 </div>
@@ -244,31 +244,31 @@ function ValuePredictorInner() {
                                         onChange={e => setCloudCover(Number(e.target.value))}
                                         className="w-full accent-purple-500 h-1.5"
                                     />
-                                    <div className="flex justify-between text-[10px] text-slate-600">
+                                    <div className="flex justify-between text-xs text-slate-600">
                                         <span>Clear</span><span>Overcast</span>
                                     </div>
                                 </>
                             )}
                             {isAutoCloud && (
-                                <p className="text-[10px] text-slate-600 italic">Real-time data from Open-Meteo</p>
+                                <p className="text-xs text-slate-600 italic">Real-time data from Open-Meteo</p>
                             )}
                         </div>
 
                         {/* Sensor / Resolution */}
                         <div className="space-y-2">
-                            <label className="text-xs text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                <Satellite className="h-3 w-3" /> Sensor Resolution
+                            <label className="text-sm text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Satellite className="h-4 w-4" /> Sensor Resolution
                             </label>
-                            <div className="grid grid-cols-2 gap-1.5">
+                            <div className="grid grid-cols-2 gap-2">
                                 {SENSORS.map(s => (
                                     <button
                                         key={s.value}
                                         onClick={() => setGsd(s.value)}
                                         className={cn(
-                                            "px-2 py-2 rounded-xl text-xs transition-all border",
+                                            "px-3 py-2.5 rounded-xl text-sm transition-colors border",
                                             gsd === s.value
-                                                ? "bg-cyan-500/20 border-cyan-500/40 text-white"
-                                                : "bg-white/3 border-white/8 text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                                                ? "bg-cyan-500/20 border-cyan-500/30 text-white"
+                                                : "bg-white/3 border-white/5 text-slate-500 hover:bg-white/5 hover:text-slate-300"
                                         )}
                                     >
                                         {s.label}
@@ -281,16 +281,16 @@ function ValuePredictorInner() {
                         <div
                             onClick={() => setCrisis(!crisis)}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-2xl border cursor-pointer transition-all",
+                                "flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-colors",
                                 crisis
-                                    ? "bg-orange-500/15 border-orange-500/30 text-orange-300"
-                                    : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/8"
+                                    ? "bg-orange-500/15 border-orange-500/25 text-orange-300"
+                                    : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5"
                             )}
                         >
                             <Zap className={cn("h-4 w-4", crisis ? "text-orange-400" : "text-slate-500")} />
                             <div>
-                                <p className="text-xs font-semibold">Crisis Zone</p>
-                                <p className="text-[10px] text-slate-500">Active conflict / disaster × 5 premium</p>
+                                <p className="text-sm font-semibold">Crisis Zone</p>
+                                <p className="text-xs text-slate-500">Active conflict / disaster × 5 premium</p>
                             </div>
                             <div className={cn(
                                 "ml-auto w-8 h-4 rounded-full transition-colors flex items-center px-0.5",
@@ -308,14 +308,14 @@ function ValuePredictorInner() {
                             onClick={handlePredict}
                             disabled={isLoading || !hasBbox}
                             className={cn(
-                                "w-full py-3 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all",
+                                "w-full py-3.5 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-colors",
                                 hasBbox
-                                    ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:opacity-90 shadow-[0_0_20px_rgba(139,92,246,0.4)]"
-                                    : "bg-white/5 text-slate-500 cursor-not-allowed"
+                                    ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:opacity-90"
+                                    : "bg-white/3 text-slate-500 cursor-not-allowed border border-white/5"
                             )}
                         >
-                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <DollarSign className="h-4 w-4" />}
-                            {isLoading ? "Calculating..." : "Predict Value"}
+                            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <DollarSign className="h-5 w-5" />}
+                            {isLoading ? "Calculating…" : "Predict Value"}
                         </button>
                     </div>
 
@@ -323,16 +323,16 @@ function ValuePredictorInner() {
                     <div className="flex-1 flex flex-col gap-4">
                         {/* Error */}
                         {error && (
-                            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
-                                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                            <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-red-500/10 border border-red-500/15 text-red-300 text-base">
+                                <AlertCircle className="h-5 w-5 flex-shrink-0" />
                                 {error}
                             </div>
                         )}
 
                         {/* Loading skeleton */}
                         {isLoading && (
-                            <div className="rounded-3xl border border-white/8 bg-white/3 p-8 flex flex-col items-center gap-4 animate-pulse">
-                                <div className="w-40 h-12 bg-white/5 rounded-2xl" />
+                            <div className="rounded-xl border border-white/5 bg-white/3 p-8 flex flex-col items-center gap-4 animate-pulse">
+                                <div className="w-40 h-12 bg-white/5 rounded-xl" />
                                 <div className="w-24 h-4 bg-white/5 rounded-full" />
                                 <div className="w-full space-y-3 mt-4">
                                     {[1, 2, 3, 4].map(i => <div key={i} className="h-6 bg-white/5 rounded-full" />)}
@@ -342,31 +342,31 @@ function ValuePredictorInner() {
 
                         {/* Result card */}
                         {result && !isLoading && (
-                            <div className="rounded-3xl border border-purple-500/20 bg-purple-500/5 p-6 space-y-5">
+                            <div className="rounded-xl border border-purple-500/15 bg-purple-500/5 p-6 space-y-5">
                                 {/* Main price */}
                                 <div className="text-center">
-                                    <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Estimated Capture Value</p>
+                                    <p className="text-sm text-slate-500 uppercase tracking-widest mb-1">Estimated Capture Value</p>
                                     <div className="text-5xl font-bold text-white tracking-tight">
                                         ${result.value_usd.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                     </div>
                                     <div className="flex items-center justify-center gap-3 mt-2">
                                         <div className="flex items-center gap-1.5">
                                             <div className={cn(
-                                                "w-2 h-2 rounded-full",
+                                                "w-2.5 h-2.5 rounded-full",
                                                 result.confidence > 0.75 ? "bg-emerald-400" : result.confidence > 0.5 ? "bg-yellow-400" : "bg-red-400"
                                             )} />
-                                            <span className="text-xs text-slate-400">
+                                            <span className="text-sm text-slate-400">
                                                 Confidence: {Math.round(result.confidence * 100)}%
                                             </span>
                                         </div>
                                         <span className="text-slate-700">·</span>
-                                        <span className="text-xs text-slate-400">{result.area_km2.toLocaleString()} km²</span>
+                                        <span className="text-sm text-slate-400">{result.area_km2.toLocaleString()} km²</span>
                                     </div>
                                 </div>
 
                                 {/* Factor breakdown */}
                                 <div className="space-y-1">
-                                    <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">Price Breakdown</p>
+                                    <p className="text-sm text-slate-500 uppercase tracking-widest mb-3">Price Breakdown</p>
                                     <div className="space-y-3">
                                         {result.factors.map((f, i) => (
                                             <FactorBar key={i} factor={f} maxAbsImpact={maxAbsImpact} />
@@ -376,18 +376,18 @@ function ValuePredictorInner() {
 
                                 {/* NASA Live Intelligence */}
                                 {result.nasa && (
-                                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 space-y-3">
-                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                                            <Radio className="h-3 w-3 text-blue-400" />
+                                    <div className="rounded-xl border border-white/5 bg-white/3 p-4 space-y-3">
+                                        <p className="text-xs text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                            <Radio className="h-4 w-4 text-blue-400" />
                                             NASA Live Intelligence
                                         </p>
 
                                         {/* Crisis events */}
                                         <div className={cn(
-                                            "flex items-start gap-2 text-xs rounded-xl px-3 py-2",
+                                            "flex items-start gap-2 text-sm rounded-xl px-3 py-2 border",
                                             result.nasa.crisis_detected
-                                                ? "bg-orange-500/10 border border-orange-500/20 text-orange-300"
-                                                : "bg-white/3 text-slate-500"
+                                                ? "bg-orange-500/10 border-orange-500/15 text-orange-300"
+                                                : "bg-white/3 border-white/5 text-slate-500"
                                         )}>
                                             <Flame className={cn("h-3.5 w-3.5 mt-0.5 flex-shrink-0", result.nasa.crisis_detected ? "text-orange-400" : "text-slate-600")} />
                                             <div>
@@ -395,7 +395,7 @@ function ValuePredictorInner() {
                                                     {result.nasa.crisis_detected ? "Active Events Detected" : "No Active Crisis Events"}
                                                 </span>
                                                 {result.nasa.crisis_events.length > 0 && (
-                                                    <p className="text-[10px] text-orange-400/70 mt-0.5">
+                                                    <p className="text-xs text-orange-400/70 mt-0.5">
                                                         {result.nasa.crisis_events.slice(0, 3).join(" · ")}
                                                     </p>
                                                 )}
@@ -405,27 +405,27 @@ function ValuePredictorInner() {
                                         {/* Space weather */}
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className={cn(
-                                                "flex items-center gap-2 text-xs rounded-xl px-3 py-2 border",
+                                                "flex items-center gap-2 text-sm rounded-xl px-3 py-2 border",
                                                 result.nasa.storm_level !== "None"
-                                                    ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-300"
+                                                    ? "bg-yellow-500/10 border-yellow-500/15 text-yellow-300"
                                                     : "bg-white/3 border-white/5 text-slate-500"
                                             )}>
-                                                <Zap className={cn("h-3 w-3", result.nasa.storm_level !== "None" ? "text-yellow-400" : "text-slate-600")} />
+                                                <Zap className={cn("h-4 w-4", result.nasa.storm_level !== "None" ? "text-yellow-400" : "text-slate-600")} />
                                                 <div>
                                                     <p className="font-medium">Magnetic Storm</p>
-                                                    <p className="text-[10px]">{result.nasa.storm_level}</p>
+                                                    <p className="text-xs">{result.nasa.storm_level}</p>
                                                 </div>
                                             </div>
                                             <div className={cn(
-                                                "flex items-center gap-2 text-xs rounded-xl px-3 py-2 border",
+                                                "flex items-center gap-2 text-sm rounded-xl px-3 py-2 border",
                                                 result.nasa.solar_flares > 0
-                                                    ? "bg-red-500/10 border-red-500/20 text-red-300"
+                                                    ? "bg-red-500/10 border-red-500/15 text-red-300"
                                                     : "bg-white/3 border-white/5 text-slate-500"
                                             )}>
-                                                <Sun className={cn("h-3 w-3", result.nasa.solar_flares > 0 ? "text-red-400" : "text-slate-600")} />
+                                                <Sun className={cn("h-4 w-4", result.nasa.solar_flares > 0 ? "text-red-400" : "text-slate-600")} />
                                                 <div>
                                                     <p className="font-medium">Solar Flares</p>
-                                                    <p className="text-[10px]">{result.nasa.solar_flares} M/X class</p>
+                                                    <p className="text-xs">{result.nasa.solar_flares} M/X class</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -434,32 +434,32 @@ function ValuePredictorInner() {
 
                                 {/* Weather Intelligence (Open-Meteo) */}
                                 {result.cloud_cover_used !== undefined && (
-                                    <div className="rounded-2xl border border-white/5 bg-white/3 p-4 flex items-center justify-between">
+                                    <div className="rounded-xl border border-white/5 bg-white/3 p-4 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Cloud className="h-4 w-4 text-cyan-400" />
                                             <div>
-                                                <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-none">Actual Cloud Cover</p>
-                                                <p className="text-xs font-semibold text-white mt-1">{result.cloud_cover_used}%</p>
+                                                <p className="text-xs text-slate-500 uppercase tracking-widest leading-none">Actual Cloud Cover</p>
+                                                <p className="text-sm font-semibold text-white mt-1">{result.cloud_cover_used}%</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-none">Source</p>
-                                            <p className="text-[10px] text-cyan-400 mt-1">{result.weather_source}</p>
+                                            <p className="text-xs text-slate-500 uppercase tracking-widest leading-none">Source</p>
+                                            <p className="text-xs text-cyan-400 mt-1">{result.weather_source}</p>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Note */}
-                                <p className="text-[10px] text-slate-600 text-center">
+                                <p className="text-xs text-slate-600 text-center">
                                     Powered by NASA EONET &amp; DONKI · Math Engine v1
                                 </p>
 
                                 {/* Generate Report CTA */}
                                 <button
                                     onClick={() => setShowReportModal(true)}
-                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/10 transition-all"
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-base font-semibold hover:bg-emerald-500/10 transition-colors"
                                 >
-                                    <FileText className="h-4 w-4" />
+                                    <FileText className="h-5 w-5" />
                                     Generate PDF Report
                                 </button>
                             </div>
@@ -467,13 +467,13 @@ function ValuePredictorInner() {
 
                         {/* Empty state */}
                         {!result && !isLoading && !error && (
-                            <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 rounded-3xl border border-white/5 bg-white/2 p-12">
-                                <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center">
+                            <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 rounded-xl border border-white/5 bg-white/3 p-12">
+                                <div className="w-16 h-16 rounded-xl bg-purple-500/10 flex items-center justify-center">
                                     <DollarSign className="h-8 w-8 text-purple-400/50" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-400">No prediction yet</p>
-                                    <p className="text-xs text-slate-600 mt-1">
+                                    <p className="text-base font-medium text-slate-400">No prediction yet</p>
+                                    <p className="text-sm text-slate-600 mt-1">
                                         {hasBbox
                                             ? "Configure the parameters and click Predict Value"
                                             : "Go to the Dashboard, draw a bounding box on the map, then open Value Predictor"

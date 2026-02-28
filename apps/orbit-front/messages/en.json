@@ -217,6 +217,13 @@
             "settings": "Settings",
             "collapse": "Collapse"
         },
+        "stats": {
+            "missions": "Missions",
+            "missionsToday": "Missions Today",
+            "predictions": "Predictions",
+            "avgScore": "Avg Score",
+            "loading": "Loading..."
+        },
         "quickActions": {
             "title": "Quick Launch",
             "newMission": {

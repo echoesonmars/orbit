@@ -66,40 +66,52 @@ def get_upcoming_launches(limit: int = 15) -> list:
         data = resp.json()
         launches = []
 
-        for launch in data.get("results", []):
-            pad = launch.get("pad", {})
-            location = pad.get("location", {})
-
-            # Extract spaceport coordinates
-            lat = None
-            lon = None
+        for i, launch in enumerate(data.get("results", [])):
             try:
-                lat = float(pad.get("latitude", 0))
-                lon = float(pad.get("longitude", 0))
-            except (TypeError, ValueError):
-                lat, lon = 28.6, -80.6  # Default: Cape Canaveral
+                pad = launch.get("pad") or {}
+                location = pad.get("location") or {}
 
-            launches.append({
-                "id": launch.get("id", ""),
-                "name": launch.get("name", "Unknown"),
-                "rocket": launch.get("rocket", {}).get("configuration", {}).get("name", "Unknown"),
-                "mission": launch.get("mission", {}).get("name") if launch.get("mission") else None,
-                "spaceport": {
-                    "name": location.get("name", "Unknown"),
-                    "country": location.get("country_code", "??"),
-                    "latitude": lat,
-                    "longitude": lon,
-                },
-                "net_date": launch.get("net", ""),
-                "status": launch.get("status", {}).get("abbrev", "TBD"),
-                "image_url": launch.get("image"),
-                "webcast_url": None,
-            })
+                lat, lon = 28.6, -80.6
+                try:
+                    lat = float(pad.get("latitude") or 0)
+                    lon = float(pad.get("longitude") or 0)
+                except (TypeError, ValueError):
+                    pass
 
-            # Check for webcasts
-            vids = launch.get("vidURLs", [])
-            if vids and len(vids) > 0:
-                launches[-1]["webcast_url"] = vids[0].get("url")
+                rocket_cfg = launch.get("rocket") or {}
+                config = rocket_cfg.get("configuration") or {}
+                rocket_name = config.get("name", "Unknown")
+
+                mission_obj = launch.get("mission")
+                mission_name = mission_obj.get("name") if isinstance(mission_obj, dict) else None
+
+                status_obj = launch.get("status") or {}
+                status_abbrev = status_obj.get("abbrev", "TBD") if isinstance(status_obj, dict) else "TBD"
+
+                launches.append({
+                    "id": str(launch.get("id", "")),
+                    "name": launch.get("name", "Unknown") or "Unknown",
+                    "rocket": rocket_name,
+                    "mission": mission_name,
+                    "spaceport": {
+                        "name": location.get("name", "Unknown") or "Unknown",
+                        "country": location.get("country_code", "??") or "??",
+                        "latitude": lat,
+                        "longitude": lon,
+                    },
+                    "net_date": launch.get("net", "") or "",
+                    "status": status_abbrev,
+                    "image_url": launch.get("image"),
+                    "webcast_url": None,
+                })
+
+                vids = launch.get("vidURLs") or []
+                if vids and len(vids) > 0:
+                    first_vid = vids[0] if isinstance(vids[0], dict) else {}
+                    launches[-1]["webcast_url"] = first_vid.get("url")
+            except Exception as row_e:
+                print(f"[DelayPredictor] Error parsing launch at index {i}: {row_e}")
+                continue
 
         return launches
 

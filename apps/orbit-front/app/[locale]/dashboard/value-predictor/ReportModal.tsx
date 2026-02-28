@@ -95,11 +95,11 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="relative w-full max-w-md mx-4 rounded-3xl border border-white/10 bg-[#0A0E17] p-6 shadow-2xl">
+            <div className="relative w-full max-w-md mx-4 rounded-xl border border-white/5 bg-[#0A0E17] p-6 shadow-2xl">
                 {/* Close */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-colors"
+                    className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors"
                 >
                     <X className="h-4 w-4" />
                 </button>
@@ -119,8 +119,8 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
                 {status === "idle" && (
                     <div className="space-y-4">
                         {/* Preview of what's included */}
-                        <div className="rounded-2xl border border-white/8 bg-white/3 p-4 space-y-2">
-                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Report Includes</p>
+                        <div className="rounded-xl border border-white/5 bg-white/3 p-4 space-y-2">
+                            <p className="text-sm text-slate-400 uppercase tracking-wider mb-2">Report Includes</p>
                             {[
                                 "Executive Summary (GPT-4)",
                                 "Price Factor Waterfall Chart",
@@ -128,16 +128,16 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
                                 "NASA Live Intelligence Data",
                                 "Methodology & Disclaimer",
                             ].map((item) => (
-                                <div key={item} className="flex items-center gap-2 text-xs text-slate-400">
-                                    <CheckCircle2 className="h-3 w-3 text-emerald-400 flex-shrink-0" />
+                                <div key={item} className="flex items-center gap-2 text-sm text-slate-400">
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
                                     {item}
                                 </div>
                             ))}
                         </div>
 
                         {/* Value summary */}
-                        <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-purple-500/5 border border-purple-500/15">
-                            <span className="text-xs text-slate-500">Estimated Value</span>
+                        <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-purple-500/5 border border-purple-500/15">
+                            <span className="text-sm text-slate-500">Estimated Value</span>
                             <span className="text-sm font-bold text-white">
                                 ${predictionData.value_usd.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                             </span>
@@ -145,7 +145,7 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
 
                         <button
                             onClick={startGeneration}
-                            className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold text-sm hover:opacity-90 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold text-base hover:opacity-90 transition-colors"
                         >
                             Generate Report
                         </button>
@@ -155,7 +155,7 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
                 {(status === "starting" || status === "processing") && (
                     <div className="flex flex-col items-center gap-4 py-6">
                         <div className="relative">
-                            <div className="w-16 h-16 rounded-full border-2 border-emerald-500/20 flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full border-2 border-emerald-500/15 flex items-center justify-center">
                                 <Loader2 className="h-7 w-7 text-emerald-400 animate-spin" />
                             </div>
                         </div>
@@ -195,7 +195,7 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
                             href={fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold text-sm hover:opacity-90 transition-all"
+                            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold text-base hover:opacity-90 transition-colors"
                         >
                             <Download className="h-4 w-4" />
                             Download PDF
@@ -214,7 +214,7 @@ export function ReportModal({ onClose, predictionData }: ReportModalProps) {
                         </div>
                         <button
                             onClick={() => { setStatus("idle"); setError(null); }}
-                            className="px-6 py-2.5 rounded-xl border border-white/10 text-slate-400 text-sm hover:bg-white/5 transition-colors"
+                            className="px-6 py-2.5 rounded-xl border border-white/5 text-slate-400 text-sm hover:bg-white/5 transition-colors"
                         >
                             Try Again
                         </button>

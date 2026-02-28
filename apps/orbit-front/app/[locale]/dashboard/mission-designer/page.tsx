@@ -34,10 +34,10 @@ type Session = {
 
 function RegionBanner({ coords, onClear }: { coords: string; onClear: () => void }) {
     return (
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">
             <MapPin className="h-4 w-4 flex-shrink-0 text-cyan-400" />
-            <span className="text-xs font-mono truncate flex-1">{coords}</span>
-            <button onClick={onClear} className="flex-shrink-0 p-1 rounded-lg hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-sm font-mono truncate flex-1">{coords}</span>
+            <button onClick={onClear} className="flex-shrink-0 p-1 rounded-xl hover:bg-cyan-500/20 transition-colors">
                 <X className="h-3.5 w-3.5" />
             </button>
         </div>
@@ -49,12 +49,12 @@ function ChatBubble({ msg }: { msg: Message }) {
     return (
         <div className={cn("flex w-full", isUser ? "justify-end" : "justify-start")}>
             {!isUser && (
-                <div className="flex-shrink-0 h-8 w-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mr-3 mt-1">
-                    <Bot className="h-4 w-4 text-purple-400" />
+                <div className="flex-shrink-0 h-9 w-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mr-3 mt-1">
+                    <Bot className="h-5 w-5 text-purple-400" />
                 </div>
             )}
             <div className={cn(
-                "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                "max-w-[80%] rounded-2xl px-5 py-4 text-base leading-relaxed",
                 isUser
                     ? "bg-purple-600/20 text-purple-100 border border-purple-500/30"
                     : "bg-slate-800/50 text-slate-300 border border-white/10"
@@ -68,15 +68,15 @@ function ChatBubble({ msg }: { msg: Message }) {
 function StreamTerminal({ text }: { text: string }) {
     if (!text) return null;
     return (
-        <div className="rounded-2xl overflow-hidden border border-green-500/30 bg-black/80">
-            <div className="flex items-center gap-2 px-4 py-2 border-b border-green-500/20">
+        <div className="rounded-xl overflow-hidden border border-green-500/30 bg-black/80">
+            <div className="flex items-center gap-2 px-5 py-2 border-b border-green-500/20">
                 <span className="flex h-2.5 w-2.5 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
                 </span>
-                <span className="text-[10px] font-mono text-green-600 uppercase tracking-widest">Processing</span>
+                <span className="text-xs font-mono text-green-600 uppercase tracking-widest">Processing</span>
             </div>
-            <p className="font-mono text-green-400 text-xs px-4 py-3 whitespace-pre-wrap break-all leading-relaxed">
+            <p className="font-mono text-green-400 text-sm px-5 py-4 whitespace-pre-wrap break-all leading-relaxed">
                 {text}<span className="animate-pulse">▊</span>
             </p>
         </div>
@@ -86,29 +86,29 @@ function StreamTerminal({ text }: { text: string }) {
 function SpecResultCards({ spec, t }: { spec: MissionSpec; t: any }) {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
                 {/* Orbit */}
-                <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-5 group hover:border-cyan-500/30 transition-colors">
-                    <Target className="h-7 w-7 text-cyan-400 mb-3" />
-                    <h3 className="text-slate-400 text-[10px] font-bold tracking-wider uppercase mb-1">{t("cardOrbit")}</h3>
-                    <p className="text-white font-semibold text-sm">{spec.orbit_type}</p>
+                <div className="bg-slate-800/40 border border-white/10 rounded-xl p-6">
+                    <Target className="h-8 w-8 text-cyan-400 mb-3" />
+                    <h3 className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">{t("cardOrbit")}</h3>
+                    <p className="text-white font-semibold text-base">{spec.orbit_type}</p>
                 </div>
                 {/* Sensor */}
-                <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-5 group hover:border-purple-500/30 transition-colors">
-                    <Satellite className="h-7 w-7 text-purple-400 mb-3" />
-                    <h3 className="text-slate-400 text-[10px] font-bold tracking-wider uppercase mb-1">{t("cardSensor")}</h3>
-                    <p className="text-white font-semibold text-sm">{spec.sensor_type}</p>
+                <div className="bg-slate-800/40 border border-white/10 rounded-xl p-6">
+                    <Satellite className="h-8 w-8 text-purple-400 mb-3" />
+                    <h3 className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">{t("cardSensor")}</h3>
+                    <p className="text-white font-semibold text-base">{spec.sensor_type}</p>
                 </div>
                 {/* Resolution */}
-                <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-5 group hover:border-emerald-500/30 transition-colors">
-                    <Maximize className="h-7 w-7 text-emerald-400 mb-3" />
-                    <h3 className="text-slate-400 text-[10px] font-bold tracking-wider uppercase mb-1">{t("cardResolution")}</h3>
-                    <p className="text-white font-semibold text-sm">{spec.resolution_meters}m GSD</p>
+                <div className="bg-slate-800/40 border border-white/10 rounded-xl p-6">
+                    <Maximize className="h-8 w-8 text-emerald-400 mb-3" />
+                    <h3 className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">{t("cardResolution")}</h3>
+                    <p className="text-white font-semibold text-base">{spec.resolution_meters}m GSD</p>
                 </div>
                 {/* Budget */}
-                <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-5 border-b-2 border-b-green-500/50 group hover:border-green-500/30 transition-colors">
-                    <DollarSign className="h-7 w-7 text-green-400 mb-3" />
-                    <h3 className="text-slate-400 text-[10px] font-bold tracking-wider uppercase mb-1">{t("cardBudget")}</h3>
+                <div className="bg-slate-800/40 border border-white/10 rounded-xl p-6">
+                    <DollarSign className="h-8 w-8 text-green-400 mb-3" />
+                    <h3 className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">{t("cardBudget")}</h3>
                     <p className="text-white font-bold text-base">
                         {spec.estimated_budget_usd ? `$${spec.estimated_budget_usd.toLocaleString('en-US')}` : 'N/A'}
                     </p>
@@ -116,12 +116,12 @@ function SpecResultCards({ spec, t }: { spec: MissionSpec; t: any }) {
             </div>
 
             {/* Reasoning */}
-            <div className="bg-slate-900 border border-purple-500/30 rounded-2xl p-5 shadow-[0_0_50px_rgba(147,51,234,0.08)]">
-                <h3 className="text-purple-400 text-xs font-bold tracking-wider uppercase mb-3 flex items-center gap-2">
+            <div className="bg-slate-900 border border-purple-500/30 rounded-2xl p-6 shadow-[0_0_50px_rgba(147,51,234,0.08)]">
+                <h3 className="text-purple-400 text-sm font-bold tracking-wider uppercase mb-3 flex items-center gap-2">
                     <Bot className="h-4 w-4" />
                     {t("reasoning")}
                 </h3>
-                <p className="text-slate-300 text-sm leading-relaxed">{spec.explanation}</p>
+                <p className="text-slate-300 text-base leading-relaxed">{spec.explanation}</p>
             </div>
         </div>
     );
@@ -165,9 +165,9 @@ function SessionsSidebar({
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-slate-400">
                         <History className="h-4 w-4" />
-                        <span className="text-xs font-semibold uppercase tracking-wider">Sessions</span>
+                        <span className="text-sm font-semibold uppercase tracking-wider">Sessions</span>
                     </div>
-                    <button onClick={onNew} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-colors" title="New">
+                    <button onClick={onNew} className="p-1.5 rounded-xl hover:bg-white/5 text-slate-400 transition-colors" title="New">
                         <Plus className="h-4 w-4" />
                     </button>
                 </div>
@@ -179,7 +179,7 @@ function SessionsSidebar({
                             key={s.id}
                             onClick={() => { if (editingId !== s.id) onSelect(s.id); }}
                             className={cn(
-                                "w-full text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer group",
+                                "w-full text-left px-4 py-3 rounded-xl transition-colors cursor-pointer group",
                                 activeId === s.id
                                     ? "bg-purple-500/15 text-white border border-purple-500/20"
                                     : "hover:bg-white/5 text-slate-400 hover:text-slate-200"
@@ -195,24 +195,24 @@ function SessionsSidebar({
                                         className="flex-1 bg-transparent text-xs text-white outline-none border-b border-purple-500/50 py-0.5"
                                         onClick={e => e.stopPropagation()}
                                     />
-                                    <button onClick={(e) => { e.stopPropagation(); confirmRename(s.id); }} className="p-0.5 text-green-400 hover:text-green-300">
+                                    <button onClick={(e) => { e.stopPropagation(); confirmRename(s.id); }} className="p-0.5 text-green-400 transition-colors" title="Confirm">
                                         <Check className="h-3 w-3" />
                                     </button>
                                 </div>
                             ) : (
-                                <p className="text-xs font-medium truncate">{s.title}</p>
+                                <p className="text-sm font-medium truncate">{s.title}</p>
                             )}
                             <div className="flex items-center justify-between mt-0.5">
                                 <div className="flex items-center gap-1 text-slate-600">
                                     <Clock className="h-2.5 w-2.5" />
-                                    <span className="text-[10px]">{new Date(s.created_at).toLocaleDateString()}</span>
+                                    <span className="text-xs">{new Date(s.created_at).toLocaleDateString()}</span>
                                 </div>
                                 {editingId !== s.id && (
                                     <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={(e) => startRename(e, s)} className="p-1 rounded hover:bg-white/10 text-slate-500 hover:text-white" title="Rename">
+                                        <button onClick={(e) => startRename(e, s)} className="p-1 rounded-xl hover:bg-white/10 text-slate-500 transition-colors" title="Rename">
                                             <Pencil className="h-2.5 w-2.5" />
                                         </button>
-                                        <button onClick={(e) => { e.stopPropagation(); onDelete(s.id); }} className="p-1 rounded hover:bg-red-500/20 text-slate-500 hover:text-red-400" title="Delete">
+                                        <button onClick={(e) => { e.stopPropagation(); onDelete(s.id); }} className="p-1 rounded-xl hover:bg-red-500/10 text-slate-500 transition-colors" title="Delete">
                                             <Trash2 className="h-2.5 w-2.5" />
                                         </button>
                                     </div>
@@ -405,11 +405,11 @@ function MissionDesignerInner() {
             {/* Main */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex items-center gap-3 px-5 py-3 border-b border-white/5 flex-shrink-0">
-                    <Link href="/dashboard" className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                <header className="flex items-center gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                    <Link href="/dashboard" className="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors">
                         <ChevronLeft className="h-5 w-5" />
                     </Link>
-                    <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors md:hidden">
+                    <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors md:hidden">
                         <History className="h-5 w-5" />
                     </button>
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -417,23 +417,23 @@ function MissionDesignerInner() {
                             <Bot className="h-5 w-5 text-purple-400" />
                         </div>
                         <div className="min-w-0">
-                            <h1 className="text-white font-bold text-sm truncate">{t("title")}</h1>
-                            <p className="text-slate-500 text-[11px] truncate hidden sm:block">{t("subtitle")}</p>
+                            <h1 className="text-white font-bold text-base truncate">{t("title")}</h1>
+                            <p className="text-slate-500 text-xs truncate hidden sm:block">{t("subtitle")}</p>
                         </div>
                     </div>
                 </header>
 
                 {/* Chat Scroll Area */}
                 <div className="flex-1 overflow-y-auto no-scrollbar">
-                    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 space-y-5">
+                    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
                         {/* Empty state */}
                         {messages.length === 0 && !isLoading && (
                             <div className="text-center py-16">
                                 <div className="inline-flex items-center justify-center p-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl mb-4">
                                     <Bot className="h-8 w-8 text-purple-400" />
                                 </div>
-                                <h2 className="text-white font-bold text-xl mb-2">{t("title")}</h2>
-                                <p className="text-slate-400 max-w-md mx-auto text-sm leading-relaxed">{t("subtitle")}</p>
+                                <h2 className="text-white font-bold text-2xl mb-2">{t("title")}</h2>
+                                <p className="text-slate-400 max-w-md mx-auto text-base leading-relaxed">{t("subtitle")}</p>
                             </div>
                         )}
 
@@ -445,7 +445,7 @@ function MissionDesignerInner() {
                         {isLoading && !rawStream && (
                             <div className="flex items-center gap-3 py-4">
                                 <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
-                                <p className="text-purple-300 font-mono text-xs tracking-widest uppercase">{t("calculating")}</p>
+                                <p className="text-purple-300 font-mono text-sm tracking-widest uppercase">{t("calculating")}</p>
                             </div>
                         )}
 
@@ -454,9 +454,9 @@ function MissionDesignerInner() {
 
                         {/* Error */}
                         {error && (
-                            <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
+                            <div className="flex items-center gap-3 p-5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
                                 <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                                <p className="text-sm">{error}</p>
+                                <p className="text-base">{error}</p>
                             </div>
                         )}
                         <div ref={chatEndRef} />
@@ -465,17 +465,16 @@ function MissionDesignerInner() {
 
                 {/* Input Bar (bottom) */}
                 <div className="flex-shrink-0 border-t border-white/5 bg-[#0A0E17]/80 backdrop-blur-md">
-                    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-4 space-y-2">
+                    <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-4 space-y-3">
                         {bboxStr && <RegionBanner coords={bboxStr} onClear={() => setBboxStr(null)} />}
 
-                        <form onSubmit={handleGenerate} className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl blur opacity-15 group-hover:opacity-30 transition duration-500" />
-                            <div className="relative bg-slate-900 border border-white/10 rounded-2xl flex items-end p-2 gap-2 shadow-2xl">
+                        <form onSubmit={handleGenerate} className="relative">
+                            <div className="relative bg-slate-900 border border-white/10 rounded-xl flex items-end p-3 gap-2">
                                 <textarea
                                     value={prompt}
                                     onChange={e => setPrompt(e.target.value)}
                                     placeholder={messages.length > 0 ? t("chatInputPlaceholder") : t("chatInputInitial")}
-                                    className="w-full bg-transparent text-slate-200 placeholder-slate-500 resize-none outline-none px-3 py-3 text-sm min-h-[44px] max-h-[120px]"
+                                    className="w-full bg-transparent text-slate-200 placeholder-slate-500 resize-none outline-none px-4 py-4 text-base min-h-[52px] max-h-[120px]"
                                     rows={1}
                                     onKeyDown={e => {
                                         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(e); }
@@ -489,9 +488,9 @@ function MissionDesignerInner() {
                                 <button
                                     type="submit"
                                     disabled={isLoading || !prompt.trim()}
-                                    className="bg-purple-600 hover:bg-purple-500 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl p-3 transition-all shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] disabled:shadow-none flex-shrink-0"
+                                    className="bg-purple-600 hover:bg-purple-500/90 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl p-3.5 transition-colors shadow-[0_0_12px_rgba(147,51,234,0.2)] disabled:shadow-none flex-shrink-0"
                                 >
-                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                                 </button>
                             </div>
                         </form>
