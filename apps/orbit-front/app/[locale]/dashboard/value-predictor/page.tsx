@@ -139,6 +139,32 @@ function ValuePredictorInner() {
 
             const data = await response.json();
             setResult(data);
+
+            // Persist mission + prediction for dashboard stats and reopen
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user && hasBbox && swLat != null && swLng != null && neLat != null && neLng != null) {
+                try {
+                    const { data: missionId, error: rpcError } = await supabase.rpc("create_mission_from_bbox", {
+                        p_sw_lat: Number(swLat),
+                        p_sw_lng: Number(swLng),
+                        p_ne_lat: Number(neLat),
+                        p_ne_lng: Number(neLng),
+                        p_user_id: user.id,
+                        p_title: `Value prediction SW(${Number(swLat).toFixed(2)}°, ${Number(swLng).toFixed(2)}°) NE(${Number(neLat).toFixed(2)}°, ${Number(neLng).toFixed(2)}°)`,
+                        p_target_type: target,
+                    });
+                    if (!rpcError && missionId) {
+                        const valueScore = Math.round((data.confidence ?? 0.5) * 100);
+                        await supabase.from("predictions").insert({
+                            mission_id: missionId,
+                            value_score: valueScore,
+                            factors: data.factors ?? [],
+                        });
+                    }
+                } catch (_) {
+                    // Non-blocking: result already shown; stats may not update until next run
+                }
+            }
         } catch (err: any) {
             setError(err.message || "Unexpected error");
         } finally {

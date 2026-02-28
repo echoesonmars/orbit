@@ -54,6 +54,7 @@ export default function ReportsPage() {
             const { data, error } = await supabase
                 .from("generated_reports")
                 .select("id, status, file_url, report_data, created_at")
+                .eq("user_id", user.id)
                 .order("created_at", { ascending: false })
                 .limit(50);
 

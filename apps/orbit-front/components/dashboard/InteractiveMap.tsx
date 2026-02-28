@@ -319,22 +319,31 @@ export function InteractiveMap() {
                             </button>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            <Link href="/dashboard/data-hub" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all">
-                                <Database className="h-5 w-5 text-orange-400" />
-                                <span className="text-[11px] font-medium text-orange-400 text-center leading-tight">{t("btnDataHub")}</span>
-                            </Link>
-                            <Link href="/dashboard/value-predictor" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-cyan-400/10 border border-cyan-500/30 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all">
-                                <TrendingUp className="h-5 w-5 text-cyan-400" />
-                                <span className="text-[11px] font-medium text-cyan-400 text-center leading-tight">{t("btnAnalyze")}</span>
-                            </Link>
-                            <Link href="/dashboard/mission-designer" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 hover:shadow-[0_0_20px_rgba(157,78,221,0.2)] transition-all">
-                                <Crosshair className="h-5 w-5 text-purple-400" />
-                                <span className="text-[11px] font-medium text-purple-400 text-center leading-tight">{t("btnMission")}</span>
-                            </Link>
-                            <Link href="/dashboard/reports" className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
-                                <FileText className="h-5 w-5 text-emerald-400" />
-                                <span className="text-[11px] font-medium text-emerald-400 text-center leading-tight">{t("btnReport")}</span>
-                            </Link>
+                            {(() => {
+                                const bboxParams = bbox
+                                    ? `?swLat=${bbox.southWest.lat.toFixed(5)}&swLng=${bbox.southWest.lng.toFixed(5)}&neLat=${bbox.northEast.lat.toFixed(5)}&neLng=${bbox.northEast.lng.toFixed(5)}`
+                                    : "";
+                                return (
+                                    <>
+                                        <Link href={`/dashboard/data-hub${bboxParams}`} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all">
+                                            <Database className="h-5 w-5 text-orange-400" />
+                                            <span className="text-[11px] font-medium text-orange-400 text-center leading-tight">{t("btnDataHub")}</span>
+                                        </Link>
+                                        <Link href={`/dashboard/value-predictor${bboxParams}`} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-cyan-400/10 border border-cyan-500/30 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all">
+                                            <TrendingUp className="h-5 w-5 text-cyan-400" />
+                                            <span className="text-[11px] font-medium text-cyan-400 text-center leading-tight">{t("btnAnalyze")}</span>
+                                        </Link>
+                                        <Link href={`/dashboard/mission-designer${bboxParams}`} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 hover:shadow-[0_0_20px_rgba(157,78,221,0.2)] transition-all">
+                                            <Crosshair className="h-5 w-5 text-purple-400" />
+                                            <span className="text-[11px] font-medium text-purple-400 text-center leading-tight">{t("btnMission")}</span>
+                                        </Link>
+                                        <Link href={`/dashboard/reports${bboxParams}`} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
+                                            <FileText className="h-5 w-5 text-emerald-400" />
+                                            <span className="text-[11px] font-medium text-emerald-400 text-center leading-tight">{t("btnReport")}</span>
+                                        </Link>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
                 </div>
