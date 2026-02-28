@@ -117,11 +117,11 @@ function ScoreCard({ result, color, isWinner }: { result: OrbitResult; color: st
 
     return (
         <div className={cn(
-            "rounded-2xl border overflow-hidden",
-            isWinner ? "border-purple-500/40 bg-purple-500/5" : "border-white/8 bg-white/3"
+            "rounded-xl border overflow-hidden",
+            isWinner ? "border-purple-500/20 bg-purple-500/5" : "border-white/5 bg-white/3"
         )}>
             {/* Header */}
-            <div className="px-4 py-3 flex items-center gap-3">
+            <div className="px-4 py-4 flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                 <div className="flex-1 min-w-0">
                     <p className="text-sm text-white font-semibold flex items-center gap-2">
@@ -149,7 +149,7 @@ function ScoreCard({ result, color, isWinner }: { result: OrbitResult; color: st
 
             {/* Expand */}
             <button onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-center py-2 text-[10px] text-slate-600 hover:text-slate-400 transition-colors">
+                className="w-full flex items-center justify-center py-2 text-xs text-slate-600 hover:text-slate-400 transition-colors">
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
                 <span className="ml-1">Breakdown</span>
             </button>
@@ -168,7 +168,7 @@ function ScoreCard({ result, color, isWinner }: { result: OrbitResult; color: st
                                     <div className="h-full rounded-full bg-purple-500 transition-all duration-700"
                                         style={{ width: `${data.score}%` }} />
                                 </div>
-                                <p className="text-[9px] text-slate-700 mt-0.5 leading-tight">{data.detail}</p>
+                                <p className="text-xs text-slate-700 mt-0.5 leading-tight">{data.detail}</p>
                             </div>
                         );
                     })}
@@ -187,7 +187,7 @@ function OrbitInputRow({ orbit, color, index, onChange, onRemove, canRemove }: {
     onChange: (o: OrbitInput) => void; onRemove: () => void; canRemove: boolean;
 }) {
     return (
-        <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-2">
+        <div className="rounded-xl border border-white/5 bg-white/3 p-3 space-y-2">
             <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                 <input
@@ -209,7 +209,7 @@ function OrbitInputRow({ orbit, color, index, onChange, onRemove, canRemove }: {
                     { label: "Ecc", key: "eccentricity" as const, min: 0, max: 0.9, step: 0.01 },
                 ].map((field) => (
                     <div key={field.key}>
-                        <p className="text-[9px] text-slate-600 uppercase mb-0.5">{field.label}</p>
+                        <p className="text-xs text-slate-600 uppercase mb-0.5">{field.label}</p>
                         <input
                             type="number"
                             value={orbit[field.key]}
@@ -217,7 +217,7 @@ function OrbitInputRow({ orbit, color, index, onChange, onRemove, canRemove }: {
                             max={field.max}
                             step={field.step}
                             onChange={(e) => onChange({ ...orbit, [field.key]: parseFloat(e.target.value) || 0 })}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono outline-none focus:border-purple-500/50 transition-colors"
+                            className="w-full bg-white/5 border border-white/5 rounded-xl px-2 py-1 text-xs text-white font-mono outline-none focus:border-purple-500/50 transition-colors"
                         />
                     </div>
                 ))}
@@ -303,13 +303,13 @@ export default function OrbitScorerPage() {
     return (
         <div className="absolute inset-0 z-30 bg-[#0A0E17]/95 backdrop-blur-3xl flex flex-col overflow-hidden">
             {/* Header */}
-            <header className="flex items-center gap-3 px-5 py-3 border-b border-white/5 flex-shrink-0">
-                <Link href="/dashboard" className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+            <header className="flex items-center gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                <Link href="/dashboard" className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
                     <ChevronLeft className="h-5 w-5" />
                 </Link>
                 <div className="flex items-center gap-2">
                     <Target className="h-5 w-5 text-purple-400" />
-                    <h1 className="text-white font-semibold text-sm">Orbit Suitability Scorer</h1>
+                    <h1 className="text-white font-semibold text-base">Orbit Suitability Scorer</h1>
                 </div>
                 <span className="ml-auto text-[10px] text-slate-600 font-mono hidden sm:block">
                     Coverage · Revisit · Latency · Resolution · Radiation
@@ -318,16 +318,16 @@ export default function OrbitScorerPage() {
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Left: Inputs */}
-                <div className="w-80 flex-shrink-0 border-r border-white/5 overflow-y-auto p-4 space-y-4">
+                <div className="w-80 flex-shrink-0 border-r border-white/5 overflow-y-auto p-5 space-y-6">
 
-                    {/* Business Goal Selector */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Business Goal</p>
+                    {/* Business Goal + Target Latitude */}
+                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Business Goal</p>
                         <div className="relative">
                             <select
                                 value={selectedGoal}
                                 onChange={(e) => setSelectedGoal(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white
+                                className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2.5 text-sm text-white
                                            appearance-none outline-none focus:border-purple-500/50 cursor-pointer"
                             >
                                 {goals.length > 0 ? goals.map((g) => (
@@ -339,13 +339,9 @@ export default function OrbitScorerPage() {
                             <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
                         </div>
                         {selectedGoalProfile && (
-                            <p className="text-[10px] text-slate-600 mt-1.5 px-1">{selectedGoalProfile.description}</p>
+                            <p className="text-xs text-slate-600 mt-1.5 px-1">{selectedGoalProfile.description}</p>
                         )}
-                    </div>
-
-                    {/* Target Latitude */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mt-3 flex items-center gap-1">
                             <MapPin className="h-3 w-3" /> Target Latitude
                         </p>
                         <div className="flex items-center gap-2">
@@ -355,16 +351,17 @@ export default function OrbitScorerPage() {
                                 className="flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer
                                            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
                                            [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-                                           [&::-webkit-slider-thumb]:bg-purple-500"
+                                           [&::-webkit-slider-thumb]:bg-purple-500
+                                           [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(139,92,246,0.25)]"
                             />
                             <span className="text-xs text-white font-mono w-10 text-right">{targetLat}°</span>
                         </div>
                     </div>
 
                     {/* Orbit Inputs */}
-                    <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Orbits to Compare</p>
+                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-4">
+                        <div className="flex items-center justify-between mb-0">
+                            <p className="text-xs text-slate-500 uppercase tracking-wider">Orbits to Compare</p>
                             {orbits.length < 4 && (
                                 <button onClick={addOrbit}
                                     className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300">
@@ -388,8 +385,8 @@ export default function OrbitScorerPage() {
                     <button
                         onClick={handleScore}
                         disabled={isLoading}
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold text-sm
-                                   hover:opacity-90 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)]
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold text-sm
+                                   hover:opacity-90 disabled:opacity-50 transition-colors shadow-[0_0_12px_rgba(139,92,246,0.2)]
                                    flex items-center justify-center gap-2"
                     >
                         {isLoading ? (
@@ -403,12 +400,12 @@ export default function OrbitScorerPage() {
                 </div>
 
                 {/* Right: Results */}
-                <div className="flex-1 flex flex-col min-w-0 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 flex flex-col min-w-0 overflow-y-auto p-5 space-y-5">
                     {result ? (
                         <>
                             {/* Winner Banner */}
                             {result.winner && (
-                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-yellow-500/20 bg-yellow-500/5">
+                                <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-yellow-500/15 bg-yellow-500/5">
                                     <Trophy className="h-4 w-4 text-yellow-400 flex-shrink-0" />
                                     <p className="text-sm text-white">
                                         <span className="text-yellow-400 font-bold">{result.winner}</span>
@@ -419,14 +416,13 @@ export default function OrbitScorerPage() {
                             )}
 
                             <div className="flex flex-col lg:flex-row gap-4">
-                                {/* Radar Chart */}
-                                <div className="flex-shrink-0 flex flex-col items-center gap-3">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Radar Comparison</p>
+                                {/* Radar Chart in container */}
+                                <div className="flex-shrink-0 rounded-xl border border-white/5 bg-white/[0.02] p-4 flex flex-col items-center gap-3">
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider">Radar Comparison</p>
                                     <RadarChart results={result.results} />
-                                    {/* Legend */}
                                     <div className="flex flex-wrap gap-3 justify-center">
                                         {result.results.map((r, i) => (
-                                            <div key={i} className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                            <div key={i} className="flex items-center gap-1.5 text-xs text-slate-500">
                                                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ORBIT_COLORS[i] }} />
                                                 {r.satellite_name}
                                             </div>
@@ -434,12 +430,12 @@ export default function OrbitScorerPage() {
                                     </div>
                                 </div>
 
-                                {/* Score Cards */}
-                                <div className="flex-1 space-y-3 min-w-0">
+                                {/* Score Cards in grid */}
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
                                     {result.results
                                         .slice()
                                         .sort((a, b) => b.suitability_score - a.suitability_score)
-                                        .map((r, i) => (
+                                        .map((r) => (
                                             <ScoreCard
                                                 key={r.satellite_name}
                                                 result={r}
@@ -451,12 +447,12 @@ export default function OrbitScorerPage() {
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+                        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8 rounded-xl border border-white/5 bg-white/[0.02]">
                             <Target className="h-16 w-16 text-purple-400/20" />
                             <p className="text-slate-500 text-sm text-center">
                                 Add orbits, select a business goal, and click Score Orbits
                             </p>
-                            <p className="text-[10px] text-slate-700 text-center">
+                            <p className="text-xs text-slate-700 text-center">
                                 Radar chart comparison will appear here
                             </p>
                         </div>

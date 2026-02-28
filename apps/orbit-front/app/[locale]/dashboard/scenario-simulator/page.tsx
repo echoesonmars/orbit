@@ -43,7 +43,7 @@ function FanChart({ data, years }: { data: FanPoint[]; years: number }) {
         const W = canvas.width = canvas.offsetWidth * 2;
         const H = canvas.height = canvas.offsetHeight * 2;
         const w = W / 2, h = H / 2;
-        const padL = 48, padR = 16, padT = 16, padB = 32;
+        const padL = 48, padR = 16, padT = 20, padB = 36;
         const cW = w - padL - padR, cH = h - padT - padB;
 
         const allVals = data.flatMap((d) => [d.p10, d.p90]);
@@ -64,9 +64,9 @@ function FanChart({ data, years }: { data: FanPoint[]; years: number }) {
             ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
             const val = maxY - (i / 4) * rangeY;
             ctx.fillStyle = "#475569";
-            ctx.font = "9px monospace";
+            ctx.font = "11px monospace";
             ctx.textAlign = "right";
-            ctx.fillText(`$${val.toFixed(1)}M`, padL - 4, y + 3);
+            ctx.fillText(`$${val.toFixed(1)}M`, padL - 6, y + 4);
         }
         // Zero line
         if (minY < 0 && maxY > 0) {
@@ -80,10 +80,10 @@ function FanChart({ data, years }: { data: FanPoint[]; years: number }) {
 
         // X-axis labels
         ctx.fillStyle = "#475569";
-        ctx.font = "9px monospace";
+        ctx.font = "11px monospace";
         ctx.textAlign = "center";
         for (let i = 0; i <= years; i++) {
-            ctx.fillText(`Y${i}`, toX(i), h - padB + 14);
+            ctx.fillText(`Y${i}`, toX(i), h - padB + 16);
         }
 
         // Fan areas
@@ -156,7 +156,7 @@ function Histogram({ bins }: { bins: HistoBin[] }) {
         const W = canvas.width = canvas.offsetWidth * 2;
         const H = canvas.height = canvas.offsetHeight * 2;
         const w = W / 2, h = H / 2;
-        const padL = 8, padR = 8, padT = 8, padB = 20;
+        const padL = 12, padR = 12, padT = 12, padB = 28;
         const cW = w - padL - padR, cH = h - padT - padB;
 
         const maxCount = Math.max(...bins.map((b) => b.count));
@@ -177,13 +177,13 @@ function Histogram({ bins }: { bins: HistoBin[] }) {
 
         // Labels
         ctx.fillStyle = "#475569";
-        ctx.font = "8px monospace";
+        ctx.font = "10px monospace";
         ctx.textAlign = "center";
         const first = bins[0];
         const last = bins[bins.length - 1];
-        ctx.fillText(`$${first.bin_start}M`, padL + barW / 2, h - 4);
-        ctx.fillText(`$${last.bin_end}M`, w - padR - barW / 2, h - 4);
-        ctx.fillText("$0", padL + (cW / 2), h - 4);
+        ctx.fillText(`$${first.bin_start}M`, padL + barW / 2, h - 6);
+        ctx.fillText(`$${last.bin_end}M`, w - padR - barW / 2, h - 6);
+        ctx.fillText("$0", padL + (cW / 2), h - 6);
     }, [bins]);
 
     return <canvas ref={canvasRef} className="w-full h-full" />;
@@ -199,7 +199,7 @@ function ParamRow({ label, value, min, max, step, unit, format, onChange }: {
     const display = format ? format(value) : value.toLocaleString();
     return (
         <div className="space-y-1">
-            <div className="flex justify-between text-[10px]">
+            <div className="flex justify-between text-xs">
                 <span className="text-slate-500">{label}</span>
                 <span className="text-white font-mono font-semibold">{display} {unit}</span>
             </div>
@@ -278,7 +278,16 @@ export default function ScenarioSimulatorPage() {
                 }),
             });
 
-            if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+                const detail = err.detail;
+                const message = typeof detail === "string"
+                    ? detail
+                    : Array.isArray(detail)
+                        ? detail.map((d: { msg?: string; message?: string }) => d?.msg ?? d?.message ?? String(d)).join(", ")
+                        : err.error || `Server error ${resp.status}`;
+                throw new Error(message);
+            }
             const data: SimResult = await resp.json();
             clearInterval(progInterval);
             setProgress(100);
@@ -295,26 +304,26 @@ export default function ScenarioSimulatorPage() {
     return (
         <div className="absolute inset-0 z-30 bg-[#0A0E17]/95 backdrop-blur-3xl flex flex-col overflow-hidden">
             {/* Header */}
-            <header className="flex items-center gap-3 px-5 py-3 border-b border-white/5 flex-shrink-0">
-                <Link href="/dashboard" className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+            <header className="flex items-center gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                <Link href="/dashboard" className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
                     <ChevronLeft className="h-5 w-5" />
                 </Link>
                 <div className="flex items-center gap-2">
                     <Cpu className="h-5 w-5 text-purple-400" />
-                    <h1 className="text-white font-semibold text-sm">Scenario Simulator</h1>
+                    <h1 className="text-white font-semibold text-base">Scenario Simulator</h1>
                 </div>
-                <span className="ml-auto text-[10px] text-slate-600 font-mono hidden sm:block">
+                <span className="ml-auto text-xs text-slate-600 font-mono hidden sm:block">
                     Monte Carlo · {nSim.toLocaleString()} simulations
                 </span>
             </header>
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Left: Sliders */}
-                <div className="w-72 flex-shrink-0 border-r border-white/5 overflow-y-auto p-4 space-y-4">
+                <div className="w-72 flex-shrink-0 border-r border-white/5 overflow-y-auto p-5 space-y-6">
 
                     {/* Financial */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Financials</p>
+                    <div className="rounded-xl border border-white/5 p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Financials</p>
                         <div className="space-y-3">
                             <ParamRow label="Total Budget" value={budget} min={1_000_000} max={100_000_000} step={500_000} unit="" format={fmt$} onChange={setBudget} />
                             <ParamRow label="Launch Cost" value={launchCost} min={500_000} max={20_000_000} step={250_000} unit="" format={fmt$} onChange={setLaunchCost} />
@@ -324,8 +333,8 @@ export default function ScenarioSimulatorPage() {
                     </div>
 
                     {/* Risk */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Risk Parameters</p>
+                    <div className="rounded-xl border border-white/5 p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Risk Parameters</p>
                         <div className="space-y-3">
                             <ParamRow label="Launch Failure" value={launchFailure} min={0.01} max={0.30} step={0.01} unit="" format={fmtPct} onChange={setLaunchFailure} />
                             <ParamRow label="Annual Failure" value={annualFailure} min={0.005} max={0.15} step={0.005} unit="" format={fmtPct} onChange={setAnnualFailure} />
@@ -333,8 +342,8 @@ export default function ScenarioSimulatorPage() {
                     </div>
 
                     {/* Revenue */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Revenue</p>
+                    <div className="rounded-xl border border-white/5 p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Revenue</p>
                         <div className="space-y-3">
                             <ParamRow label="Revenue / Op Day" value={revenuePerDay} min={100} max={50_000} step={100} unit="$" onChange={setRevenuePerDay} />
                             <ParamRow label="Op Days / Year (avg)" value={clearDaysMu} min={10} max={365} step={5} unit="days" onChange={setClearDaysMu} />
@@ -343,8 +352,8 @@ export default function ScenarioSimulatorPage() {
                     </div>
 
                     {/* Simulation */}
-                    <div>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Simulation</p>
+                    <div className="rounded-xl border border-white/5 p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Simulation</p>
                         <div className="space-y-3">
                             <ParamRow label="Mission Duration" value={years} min={1} max={20} step={1} unit="yrs" onChange={setYears} />
                             <ParamRow label="Iterations" value={nSim} min={1000} max={50_000} step={1000} unit="" onChange={setNSim} />
@@ -353,8 +362,8 @@ export default function ScenarioSimulatorPage() {
 
                     {/* Run Button */}
                     <button onClick={handleRun} disabled={isLoading}
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold text-sm
-                                       hover:opacity-90 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)]
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold text-sm
+                                       hover:opacity-90 disabled:opacity-50 transition-all shadow-[0_0_12px_rgba(139,92,246,0.2)]
                                        flex items-center justify-center gap-2">
                         {isLoading ? (
                             <><Loader2 className="h-4 w-4 animate-spin" /> Simulating...</>
@@ -366,7 +375,7 @@ export default function ScenarioSimulatorPage() {
                     {/* Progress bar */}
                     {isLoading && (
                         <div className="space-y-1.5">
-                            <div className="flex justify-between text-[9px] text-slate-600">
+                            <div className="flex justify-between text-xs text-slate-600">
                                 <span>Processing {nSim.toLocaleString()} life-cycles...</span>
                                 <span>{Math.round(progress)}%</span>
                             </div>
@@ -377,7 +386,18 @@ export default function ScenarioSimulatorPage() {
                         </div>
                     )}
 
-                    {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+                    {error && (
+                        <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-3 py-2">
+                            <p className="text-xs text-red-400">{error}</p>
+                            <button
+                                type="button"
+                                onClick={() => setError(null)}
+                                className="mt-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Results */}
@@ -385,12 +405,12 @@ export default function ScenarioSimulatorPage() {
                     {result ? (
                         <>
                             {/* Verdict row */}
-                            <div className="flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-4">
                                 {/* Verdict badge */}
-                                <div className="flex-1 min-w-[140px] px-4 py-3 rounded-2xl border"
+                                <div className="flex-1 min-w-[160px] px-5 py-4 rounded-xl border"
                                     style={{ borderColor: result.verdict_color + "40", backgroundColor: result.verdict_color + "10" }}>
-                                    <p className="text-[10px] text-slate-500 uppercase mb-1">Verdict</p>
-                                    <p className="text-lg font-black" style={{ color: result.verdict_color }}>
+                                    <p className="text-xs text-slate-500 uppercase mb-1">Verdict</p>
+                                    <p className="text-xl font-black" style={{ color: result.verdict_color }}>
                                         {result.verdict}
                                     </p>
                                 </div>
@@ -400,16 +420,16 @@ export default function ScenarioSimulatorPage() {
                                     { label: "Total Loss Risk", value: `${result.total_loss_pct}%`, icon: AlertTriangle, color: "#F59E0B" },
                                     { label: "Investment", value: `$${(result.total_investment_usd / 1_000_000).toFixed(1)}M`, icon: DollarSign, color: "#8B5CF6" },
                                 ].map((m) => (
-                                    <div key={m.label} className="flex-1 min-w-[110px] px-3 py-3 rounded-2xl border border-white/8 bg-white/3 text-center">
-                                        <m.icon className="h-4 w-4 mx-auto mb-1" style={{ color: m.color }} />
-                                        <p className="text-base font-black font-mono" style={{ color: m.color }}>{m.value}</p>
-                                        <p className="text-[9px] text-slate-600">{m.label}</p>
+                                    <div key={m.label} className="flex-1 min-w-[120px] px-4 py-4 rounded-xl border border-white/5 bg-white/3 text-center">
+                                        <m.icon className="h-5 w-5 mx-auto mb-1.5" style={{ color: m.color }} />
+                                        <p className="text-lg font-black font-mono" style={{ color: m.color }}>{m.value}</p>
+                                        <p className="text-xs text-slate-600 mt-0.5">{m.label}</p>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Percentile table */}
-                            <div className="rounded-2xl border border-white/8 bg-white/3 overflow-hidden">
+                            <div className="rounded-xl border border-white/5 bg-white/3 overflow-hidden">
                                 <div className="grid grid-cols-7 text-center">
                                     {[
                                         { pct: "P5", val: result.percentiles.p5, label: "Disaster", color: "#6B7280" },
@@ -420,61 +440,63 @@ export default function ScenarioSimulatorPage() {
                                         { pct: "P90", val: result.percentiles.p90, label: "Best", color: "#8B5CF6" },
                                         { pct: "P95", val: result.percentiles.p95, label: "Excellent", color: "#EC4899" },
                                     ].map((p) => (
-                                        <div key={p.pct} className="py-3 px-1 border-r border-white/5 last:border-r-0">
-                                            <p className="text-[9px] text-slate-600">{p.label}</p>
-                                            <p className="text-xs font-bold font-mono mt-0.5" style={{ color: p.color }}>
+                                        <div key={p.pct} className="py-4 px-2 border-r border-white/5 last:border-r-0">
+                                            <p className="text-xs text-slate-600">{p.label}</p>
+                                            <p className="text-sm font-bold font-mono mt-1" style={{ color: p.color }}>
                                                 ${p.val.toFixed(1)}M
                                             </p>
-                                            <p className="text-[9px] text-slate-600">{p.pct}</p>
+                                            <p className="text-xs text-slate-600 mt-0.5">{p.pct}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Charts */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-                                <div className="rounded-2xl border border-white/8 bg-white/3 p-3 flex flex-col">
-                                    <div className="flex items-center gap-4 mb-2">
-                                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">Uncertainty Fan Chart</p>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 min-h-0">
+                                <div className="rounded-xl border border-white/5 bg-white/3 p-4 flex flex-col min-h-[320px]">
+                                    <div className="flex items-center gap-4 mb-3">
+                                        <p className="text-xs text-slate-500 uppercase tracking-wider">Uncertainty Fan Chart</p>
                                         <div className="flex items-center gap-3 ml-auto">
                                             {[{ c: "#10B981", l: "Median" }, { c: "#3B82F6", l: "P90 Best" }, { c: "#EF4444", l: "P10 Worst" }].map((x) => (
-                                                <div key={x.l} className="flex items-center gap-1 text-[9px] text-slate-600">
+                                                <div key={x.l} className="flex items-center gap-1 text-xs text-slate-600">
                                                     <span className="w-4 h-px" style={{ backgroundColor: x.c, display: "inline-block" }} />
                                                     {x.l}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="flex-1 min-h-[200px]">
+                                    <div className="flex-1 min-h-[260px]">
                                         <FanChart data={result.fan_chart} years={result.mission_duration_years} />
                                     </div>
                                 </div>
-                                <div className="rounded-2xl border border-white/8 bg-white/3 p-3 flex flex-col">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
+                                <div className="rounded-xl border border-white/5 bg-white/3 p-4 flex flex-col min-h-[320px]">
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">
                                         Profit Distribution ({result.n_simulations.toLocaleString()} runs)
                                         <span className="ml-2 text-emerald-400">■</span> Profit
                                         <span className="ml-1 text-red-400">■</span> Loss
                                     </p>
-                                    <div className="flex-1 min-h-[200px]">
+                                    <div className="flex-1 min-h-[260px]">
                                         <Histogram bins={result.histogram} />
                                     </div>
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-5">
-                            <div className="relative">
-                                <Cpu className="h-20 w-20 text-purple-400/20" />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-slate-400 text-sm font-medium">Monte Carlo Investment Simulator</p>
-                                <p className="text-slate-600 text-xs mt-1">Configure parameters and click Run Simulation</p>
-                            </div>
-                            <div className="text-[10px] text-slate-700 space-y-1 text-center">
-                                <p>• Runs 10,000 virtual satellite life-cycles</p>
-                                <p>• Simulates launch failures, satellite death, weather</p>
-                                <p>• Returns P10/P50/P90 return on investment</p>
-                                <p>• Fan chart shows uncertainty cone over time</p>
+                        <div className="flex-1 flex flex-col items-center justify-center gap-5 p-8">
+                            <div className="rounded-xl border border-white/5 bg-white/[0.02] flex flex-col items-center gap-5 py-10 px-8 max-w-md">
+                                <div className="relative">
+                                    <Cpu className="h-20 w-20 text-purple-400/20" />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-slate-400 text-sm font-medium">Monte Carlo Investment Simulator</p>
+                                    <p className="text-slate-600 text-xs mt-1">Configure parameters and click Run Simulation</p>
+                                </div>
+                                <div className="text-xs text-slate-700 space-y-1 text-center">
+                                    <p>• Runs 10,000 virtual satellite life-cycles</p>
+                                    <p>• Simulates launch failures, satellite death, weather</p>
+                                    <p>• Returns P10/P50/P90 return on investment</p>
+                                    <p>• Fan chart shows uncertainty cone over time</p>
+                                </div>
                             </div>
                         </div>
                     )}

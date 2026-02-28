@@ -126,9 +126,9 @@ function TimeSeriesChart({ series, label, color }: {
 // ─── Anomaly Card ─────────────────────────────────────────────────────────────
 
 const severityConfig: Record<Severity, { color: string; icon: typeof AlertTriangle; bg: string }> = {
-    Fatal: { color: "text-red-400", bg: "border-red-500/20 bg-red-500/5", icon: XCircle },
-    Critical: { color: "text-orange-400", bg: "border-orange-500/20 bg-orange-500/5", icon: AlertTriangle },
-    Warning: { color: "text-yellow-400", bg: "border-yellow-500/20 bg-yellow-500/5", icon: Info },
+    Fatal: { color: "text-red-400", bg: "border-red-500/15 bg-red-500/5", icon: XCircle },
+    Critical: { color: "text-orange-400", bg: "border-orange-500/15 bg-orange-500/5", icon: AlertTriangle },
+    Warning: { color: "text-yellow-400", bg: "border-yellow-500/15 bg-yellow-500/5", icon: Info },
 };
 
 function AnomalyCard({ anomaly, index }: { anomaly: Anomaly; index: number }) {
@@ -144,11 +144,11 @@ function AnomalyCard({ anomaly, index }: { anomaly: Anomaly; index: number }) {
                 <cfg.icon className={cn("h-4 w-4 flex-shrink-0 mt-0.5", cfg.color)} />
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className={cn("text-[10px] font-bold uppercase tracking-wider", cfg.color)}>
+                        <span className={cn("text-xs font-bold uppercase tracking-wider", cfg.color)}>
                             {anomaly.severity}
                         </span>
-                        <span className="text-[10px] text-slate-600 font-mono">{anomaly.timestamp}</span>
-                        <span className="text-[10px] text-slate-700">score: {anomaly.anomaly_score.toFixed(3)}</span>
+                        <span className="text-xs text-slate-600 font-mono">{anomaly.timestamp}</span>
+                        <span className="text-xs text-slate-700">score: {anomaly.anomaly_score.toFixed(3)}</span>
                     </div>
                     <p className="text-xs text-slate-300 mt-0.5 leading-relaxed line-clamp-2">{anomaly.insight}</p>
                 </div>
@@ -157,10 +157,10 @@ function AnomalyCard({ anomaly, index }: { anomaly: Anomaly; index: number }) {
 
             {expanded && (
                 <div className="px-3 pb-3 border-t border-white/5 pt-2 space-y-1">
-                    <p className="text-[9px] text-slate-600 uppercase tracking-wider">Sensor readings at anomaly:</p>
+                    <p className="text-xs text-slate-600 uppercase tracking-wider">Sensor readings at anomaly:</p>
                     <div className="grid grid-cols-2 gap-1">
                         {Object.entries(anomaly.sensor_values).slice(0, 8).map(([k, v]) => (
-                            <div key={k} className="flex justify-between text-[10px] px-1.5 py-0.5 rounded bg-white/3">
+                            <div key={k} className="flex justify-between text-xs px-1.5 py-0.5 rounded bg-white/3">
                                 <span className="text-slate-500 truncate">{k}</span>
                                 <span className="text-white font-mono ml-2">{typeof v === "number" ? v.toFixed(3) : v}</span>
                             </div>
@@ -174,8 +174,24 @@ function AnomalyCard({ anomaly, index }: { anomaly: Anomaly; index: number }) {
 
 // ─── Drop Zone ────────────────────────────────────────────────────────────────
 
-function DropZone({ onFile }: { onFile: (f: File) => void }) {
+const MAX_CSV_SIZE = 50 * 1024 * 1024; // 50 MB
+
+function DropZone({ onFile, onValidationError }: { onFile: (f: File) => void; onValidationError?: (msg: string) => void }) {
     const [isDragging, setIsDragging] = useState(false);
+
+    const validateAndAccept = useCallback((f: File | undefined) => {
+        if (!f) return;
+        if (!f.name.toLowerCase().endsWith(".csv")) {
+            onValidationError?.("Please upload a CSV file");
+            return;
+        }
+        if (f.size > MAX_CSV_SIZE) {
+            onValidationError?.("File too large (max 50 MB)");
+            return;
+        }
+        onValidationError?.("");
+        onFile(f);
+    }, [onFile, onValidationError]);
 
     return (
         <div
@@ -185,16 +201,16 @@ function DropZone({ onFile }: { onFile: (f: File) => void }) {
                 e.preventDefault();
                 setIsDragging(false);
                 const f = e.dataTransfer.files[0];
-                if (f?.name.endsWith(".csv")) onFile(f);
+                validateAndAccept(f);
             }}
             className={cn(
-                "border-2 border-dashed rounded-3xl p-10 flex flex-col items-center gap-4 transition-all cursor-pointer",
+                "border border-dashed rounded-xl p-10 flex flex-col items-center gap-4 transition-all cursor-pointer",
                 isDragging
-                    ? "border-purple-500/60 bg-purple-500/10"
-                    : "border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/3"
+                    ? "border-purple-500/30 bg-purple-500/10"
+                    : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/3"
             )}
         >
-            <div className={cn("p-4 rounded-2xl transition-all", isDragging ? "bg-purple-500/20" : "bg-white/5")}>
+            <div className={cn("p-4 rounded-xl transition-all", isDragging ? "bg-purple-500/20" : "bg-white/5")}>
                 <Upload className={cn("h-8 w-8 transition-colors", isDragging ? "text-purple-400" : "text-slate-500")} />
             </div>
             <div className="text-center">
@@ -204,11 +220,11 @@ function DropZone({ onFile }: { onFile: (f: File) => void }) {
             <input
                 type="file" accept=".csv" className="hidden"
                 id="csv-input"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
+                onChange={(e) => { const f = e.target.files?.[0]; validateAndAccept(f); e.target.value = ""; }}
             />
             <label
                 htmlFor="csv-input"
-                className="px-5 py-2 rounded-xl border border-white/15 text-slate-400 text-xs hover:bg-white/5 cursor-pointer transition-colors"
+                className="px-5 py-2 rounded-xl border border-white/5 text-slate-400 text-xs hover:bg-white/5 cursor-pointer transition-colors"
             >
                 Browse Files
             </label>
@@ -252,7 +268,13 @@ export default function FailureForensicsPage() {
 
             if (!resp.ok) {
                 const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
-                throw new Error(err.error || `Server error ${resp.status}`);
+                const detail = err.detail;
+                const message = typeof detail === "string"
+                    ? detail
+                    : Array.isArray(detail)
+                        ? detail.map((d: { msg?: string; message?: string }) => d?.msg ?? d?.message ?? String(d)).join(", ")
+                        : err.error || `Server error ${resp.status}`;
+                throw new Error(message);
             }
 
             const data: AnalysisResult = await resp.json();
@@ -270,53 +292,53 @@ export default function FailureForensicsPage() {
     return (
         <div className="absolute inset-0 z-30 bg-[#0A0E17]/95 backdrop-blur-3xl flex flex-col overflow-hidden">
             {/* Header */}
-            <header className="flex items-center gap-3 px-5 py-3 border-b border-white/5 flex-shrink-0">
-                <Link href="/dashboard" className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+            <header className="flex items-center gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                <Link href="/dashboard" className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
                     <ChevronLeft className="h-5 w-5" />
                 </Link>
                 <div className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-red-400" />
-                    <h1 className="text-white font-semibold text-sm">Failure Forensics</h1>
+                    <h1 className="text-white font-semibold text-base">Failure Forensics</h1>
                 </div>
-                <span className="ml-auto text-[10px] text-slate-600 font-mono hidden sm:block">
+                <span className="ml-auto text-xs text-slate-600 font-mono hidden sm:block">
                     Isolation Forest · Anomaly Detection
                 </span>
             </header>
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Left: Upload + Config */}
-                <div className="w-80 flex-shrink-0 border-r border-white/5 overflow-y-auto p-4 space-y-4">
+                <div className="w-80 flex-shrink-0 border-r border-white/5 overflow-y-auto p-5 space-y-6">
 
                     {/* File zone */}
                     {file ? (
-                        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-emerald-500/15 bg-emerald-500/5">
                             <FileText className="h-4 w-4 text-emerald-400 flex-shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-xs text-white font-semibold truncate">{file.name}</p>
-                                <p className="text-[10px] text-slate-600">{(file.size / 1024).toFixed(1)} KB</p>
+                                <p className="text-xs text-slate-600">{(file.size / 1024).toFixed(1)} KB</p>
                             </div>
-                            <button onClick={() => { setFile(null); setResult(null); }}
+                            <button onClick={() => { setFile(null); setResult(null); setError(null); }}
                                 className="text-slate-600 hover:text-red-400 transition-colors ml-auto flex-shrink-0">
                                 <XCircle className="h-4 w-4" />
                             </button>
                         </div>
                     ) : (
-                        <DropZone onFile={setFile} />
+                        <DropZone onFile={setFile} onValidationError={(msg) => setError(msg || null)} />
                     )}
 
                     {/* Config */}
-                    <div className="space-y-3">
+                    <div className="rounded-xl border border-white/5 p-4 space-y-3">
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5">Satellite ID</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1.5">Satellite ID</p>
                             <input
                                 value={satelliteId}
                                 onChange={(e) => setSatelliteId(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none focus:border-purple-500/50"
+                                className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none focus:border-purple-500/50"
                                 placeholder="SAT-001"
                             />
                         </div>
                         <div>
-                            <div className="flex justify-between text-[10px] mb-1.5">
+                            <div className="flex justify-between text-xs mb-1.5">
                                 <span className="text-slate-500 uppercase tracking-wider">Sensitivity</span>
                                 <span className="text-white font-mono">{(contamination * 100).toFixed(0)}% expected anomalies</span>
                             </div>
@@ -328,6 +350,7 @@ export default function FailureForensicsPage() {
                                            [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
                                            [&::-webkit-slider-thumb]:bg-red-500"
                             />
+                            <p className="text-xs text-slate-600 mt-1">Higher = more points marked as anomalies</p>
                         </div>
                     </div>
 
@@ -335,8 +358,8 @@ export default function FailureForensicsPage() {
                     <button
                         onClick={handleAnalyze}
                         disabled={!file || isLoading}
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold text-sm
-                                   hover:opacity-90 disabled:opacity-40 transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)]
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold text-sm
+                                   hover:opacity-90 disabled:opacity-40 transition-all shadow-[0_0_12px_rgba(239,68,68,0.2)]
                                    flex items-center justify-center gap-2"
                     >
                         {isLoading ? (
@@ -345,17 +368,27 @@ export default function FailureForensicsPage() {
                             <><Zap className="h-4 w-4" /> Run Analysis</>
                         )}
                     </button>
+                    {!file && (
+                        <p className="text-xs text-slate-600">Upload a CSV to enable analysis.</p>
+                    )}
 
                     {error && (
-                        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2">
+                        <div className="rounded-xl border border-red-500/15 bg-red-500/5 px-3 py-2">
                             <p className="text-xs text-red-400">{error}</p>
+                            <button
+                                type="button"
+                                onClick={() => setError(null)}
+                                className="mt-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                            >
+                                Dismiss
+                            </button>
                         </div>
                     )}
 
                     {/* Result summary */}
                     {result && (
                         <div className="space-y-2">
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Analysis Summary</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider">Analysis Summary</p>
                             <div className="grid grid-cols-2 gap-2">
                                 {[
                                     { label: "Total Rows", v: result.total_rows.toLocaleString(), color: "text-white" },
@@ -367,7 +400,7 @@ export default function FailureForensicsPage() {
                                 ].map((item) => (
                                     <div key={item.label} className="px-2.5 py-2 rounded-xl border border-white/5 bg-white/2 text-center">
                                         <p className={cn("text-base font-bold font-mono", item.color)}>{item.v}</p>
-                                        <p className="text-[9px] text-slate-600">{item.label}</p>
+                                        <p className="text-xs text-slate-600">{item.label}</p>
                                     </div>
                                 ))}
                             </div>
@@ -382,14 +415,14 @@ export default function FailureForensicsPage() {
                             {/* Sensor selector + Charts */}
                             <div className="border-b border-white/5 p-4 space-y-3">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Sensor Channel:</p>
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider">Sensor Channel:</p>
                                     {result.chart_sensors.map((s, i) => (
                                         <button
                                             key={s}
                                             onClick={() => setActiveSensor(s)}
                                             style={{ borderColor: activeSensor === s ? SENSOR_COLORS[i] : "transparent" }}
                                             className={cn(
-                                                "px-2 py-0.5 rounded-lg border text-[10px] font-mono transition-all",
+                                                "px-2 py-0.5 rounded-xl border text-xs font-mono transition-all",
                                                 activeSensor === s ? "text-white bg-white/5" : "text-slate-600 hover:text-slate-400"
                                             )}
                                         >
@@ -399,8 +432,8 @@ export default function FailureForensicsPage() {
                                 </div>
 
                                 {activeSensor && result.chart_series[activeSensor] && (
-                                    <div className="bg-white/2 rounded-2xl border border-white/5 p-3">
-                                        <p className="text-[9px] text-slate-600 mb-2">
+                                    <div className="bg-white/2 rounded-xl border border-white/5 p-3">
+                                        <p className="text-xs text-slate-600 mb-2">
                                             {result.chart_series[activeSensor].length} data points
                                             · <span className="text-red-400">Red dots = anomalies</span>
                                         </p>
@@ -416,7 +449,7 @@ export default function FailureForensicsPage() {
                             {/* Anomaly list */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-2">
                                 <div className="flex items-center justify-between mb-1">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider">
                                         Detected Anomalies ({result.anomalies.length})
                                     </p>
                                 </div>
@@ -435,21 +468,23 @@ export default function FailureForensicsPage() {
                         </>
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center gap-5 p-8">
-                            <div className="relative">
-                                <AlertTriangle className="h-20 w-20 text-red-400/20" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Zap className="h-8 w-8 text-red-400/40" />
+                            <div className="rounded-xl border border-white/5 bg-white/[0.02] flex flex-col items-center gap-5 py-10 px-8 max-w-md">
+                                <div className="relative">
+                                    <AlertTriangle className="h-20 w-20 text-red-400/20" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Zap className="h-8 w-8 text-red-400/40" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-slate-400 text-sm font-medium">AI-Powered Anomaly Detection</p>
-                                <p className="text-slate-600 text-xs mt-1">Upload a telemetry CSV to begin forensic analysis</p>
-                            </div>
-                            <div className="text-[10px] text-slate-700 space-y-1 text-center">
-                                <p>• Supports any CSV with numeric sensor columns</p>
-                                <p>• NaN values automatically interpolated</p>
-                                <p>• IsolationForest unsupervised ML algorithm</p>
-                                <p>• AI-generated insights for each anomaly</p>
+                                <div className="text-center">
+                                    <p className="text-slate-400 text-sm font-medium">AI-Powered Anomaly Detection</p>
+                                    <p className="text-slate-600 text-xs mt-1">Upload a telemetry CSV to begin forensic analysis</p>
+                                </div>
+                                <div className="text-xs text-slate-700 space-y-1 text-center">
+                                    <p>• Supports any CSV with numeric sensor columns</p>
+                                    <p>• NaN values automatically interpolated</p>
+                                    <p>• IsolationForest unsupervised ML algorithm</p>
+                                    <p>• AI-generated insights for each anomaly</p>
+                                </div>
                             </div>
                         </div>
                     )}
